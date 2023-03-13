@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import { GetMileage } from '@/api/AGVS';
 import moment from 'moment'
+import bus from '@/event-bus.js'
 export default {
   data() {
     return {
@@ -17,14 +17,13 @@ export default {
   },
   computed: {
     mileage() {
-      return this.val.toFixed(2)
+      return this.val.toFixed(3)
     }
   },
   mounted() {
-    setInterval(async () => {
-      this.val = await GetMileage();
-    }, 1000);
-
+    bus.on('/mileage', (data) => {
+      this.val = data;
+    });
     setInterval(() => {
       this.time = moment(Date.now()).format('yyyy/MM/DD HH:mm:ss');
     }, 1000);

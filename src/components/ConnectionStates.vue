@@ -1,7 +1,19 @@
 <template>
-  <div class="connection-states w-100 bg-light px-1">
+  <div class="connection-states w-100 px-1">
     <table class="w-100">
       <tbody>
+        <tr>
+          <td>
+            <div class="connected">
+              <i :class="'bi bi-circle-fill'"></i> UI Server
+            </div>
+          </td>
+          <!-- <td>
+            <div :class="agvc_state">
+              <i class="bi bi-circle-fill"></i> AGVC
+            </div>
+          </td>-->
+        </tr>
         <tr>
           <td>
             <div :class="rosbridge_state">
@@ -10,11 +22,11 @@
           </td>
           <td>
             <div :class="agvc_state">
-              <i class="bi bi-circle-fill"></i> AGVC
+              <i class="bi bi-circle-fill"></i> VMS
             </div>
           </td>
         </tr>
-        <tr>
+        <!-- <tr>
           <td>
             <div :class="rosbridge_state">
               <i :class="'bi bi-circle-fill'"></i> ROSSSS
@@ -25,13 +37,14 @@
               <i class="bi bi-circle-fill"></i> AGVSSS
             </div>
           </td>
-        </tr>
+        </tr>-->
       </tbody>
     </table>
   </div>
 </template>
 
 <script>
+import param from '@/gpm_param'
 export default {
   data() {
     return {
@@ -56,14 +69,21 @@ export default {
   },
   methods: {
     WebSocketConnect() {
-      var _ws = new WebSocket('wss://localhost:7025/ws/ConnectionState')
+
+      var _ws = new WebSocket(`${param.backend_host.replace('http', 'ws')}/ws/ConnectionState`)
       _ws.onopen = (ws) => {
         console.log('opened');
+        _ws.onmessage = (ws, ev) => {
+          var data = JSON.parse(ws.data)
+          this.connections = data;
+        }
       }
-      _ws.onmessage = (ws, ev) => {
-        var data = JSON.parse(ws.data)
-        this.connections = data;
+      _ws.onclose = () => {
+        this.connections.RosbridgeServer = this.connections.AGVC = 'DISCONNECT';
+        this.WebSocketConnect();
+        console.log('ws/ConnectionState close');
       }
+
     }
   },
   mounted() {

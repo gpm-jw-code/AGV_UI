@@ -1,80 +1,96 @@
 <template>
   <div class="status-card">
-    <h4 class="text-start">狀態資訊</h4>
+    <h4 class="text-start">{{$t('Status_info')}}</h4>
     <div class="w-100 border p-3">
       <table class="status-tb w-100">
         <tbody>
           <tr align="justify">
-            <td>狀態</td>
+            <td>{{$t('status')}}</td>
             <td class="val-column">
-              <b-button class="w-100" variant="warning">
-                <b>Alarm</b>
+              <b-button class="w-100" :variant="state_btn_variant">
+                <b>{{vms_data.MainState }}</b>
               </b-button>
             </td>
-            <td>CIM 狀態</td>
+            <td>CIM {{$t('status')}}</td>
             <td class="val-column">4</td>
           </tr>
           <tr align="justify">
-            <td>目前位置</td>
+            <td>{{$t('current_position')}}</td>
             <td class="val-column">
-              <el-input disabled v-model="CurrentPosition"></el-input>
+              <b-form-input size="sm" disabled v-model="vms_data.Tag" :state="vms_data.Tag>0"></b-form-input>
+              <!-- <el-input disabled v-model="vms_data.Tag"></el-input> -->
             </td>
-            <td>目標位置</td>
+            <td>{{$t('target_position')}}</td>
             <td class="val-column">
-              <el-input disabled v-model="currentPosition"></el-input>
-            </td>
-          </tr>
-          <tr align="justify">
-            <td>動作名稱</td>
-            <td class="val-column">
-              <el-input disabled v-model="currentPosition"></el-input>
-            </td>
-            <td>載物ID</td>
-            <td class="val-column">
-              <el-input disabled v-model="CarrierID"></el-input>
+              <b-form-input size="sm" disabled v-model="currentPosition"></b-form-input>
+              <!-- <el-input disabled v-model="currentPosition"></el-input> -->
             </td>
           </tr>
           <tr align="justify">
-            <td>異常</td>
+            <td>{{$t('action_name')}}</td>
+            <td class="val-column">
+              <b-form-input size="sm" disabled v-model="currentPosition"></b-form-input>
+            </td>
+            <td>{{$t('carrier_id')}}</td>
+            <td class="val-column">
+              <b-form-input size="sm" disabled v-model="vms_data.CST_Data"></b-form-input>
+            </td>
+          </tr>
+          <tr align="justify">
+            <td>{{$t('abormal')}}</td>
             <td colspan="4">
-              <el-input type="textarea" disabled v-model="CurrentPosition"></el-input>
+              <b-form-textarea disabled v-model="NewestAlarm" :state="NewestAlarm==''"></b-form-textarea>
+              <!-- <el-input type="textarea" disabled v-model="NewestAlarm"></el-input> -->
+            </td>
+          </tr>
+          <tr v-if="true" align="justify">
+            <td>地圖比對率</td>
+            <td>
+              <b-form-input size="sm" disabled v-model="vms_data.MapComparsionRate"></b-form-input>
+            </td>
+          </tr>
+          <tr v-if="false" align="justify">
+            <td>AGV Direct</td>
+            <td>
+              <b-form-input size="sm" disabled v-model="vms_data.AGV_Direct"></b-form-input>
             </td>
           </tr>
         </tbody>
       </table>
-      <!-- <el-form :inline="true">
-        <el-form-item label="狀態">
-          <b-button variant="warning">
-            <b>Alarm</b>
-          </b-button>
-        </el-form-item>
-        <el-form-item label="CIM狀態"></el-form-item>
-      </el-form>
-      <el-form :inline="true">
-        <el-form-item label="目前位置">
-          <el-input disabled></el-input>
-        </el-form-item>
-        <el-form-item label="目標位置">
-          <el-input disabled></el-input>
-        </el-form-item>
-      </el-form>-->
     </div>
   </div>
 </template>
 
 <script>
+import bus from '@/event-bus.js'
+import VMSData from '@/ViewModels/VMSData.js'
 export default {
   props: {
-    ModuleInformation: {
-      type: Object,
-      default() {
-        return {
 
-        }
-      }
+  },
+  data() {
+    return {
+      currentPosition: '123',
+      vms_data: new VMSData()
     }
   },
   computed: {
+    state_btn_variant() {
+      var _state = this.vms_data.MainState.toUpperCase();
+      if (_state == "DOWN" | _state == "ALARM" | _state == "STOP") {
+        return 'danger'
+      }
+      else if (_state == "IDLE" | _state == "INITIALIZE" | _state == "CHARGING") {
+        return 'primary'
+      }
+      else if (_state == "RUN" | _state == "WORKING") {
+        return "success";
+      }
+      else if (_state == "WARNING") {
+        return 'warning'
+      }
+      return ""
+    },
     CurrentPosition() {
       if (this.ModuleInformation.nav_state == undefined) {
         return '-1';
@@ -88,12 +104,19 @@ export default {
       } else {
         return this.ModuleInformation.CSTReader.data;
       }
+    },
+    NewestAlarm() {
+      if (this.vms_data.NewestAlarm == undefined)
+        return '';
+
+      return this.$i18n.locale == 'zh-TW' ? this.vms_data.NewestAlarm.CN : this.vms_data.NewestAlarm.Description;
     }
   },
-  data() {
-    return {
-      currentPosition: '123'
-    }
+
+  mounted() {
+    bus.on('/vms_data', (data) => {
+      this.vms_data = data
+    });
   },
 }
 </script>

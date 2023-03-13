@@ -1,26 +1,31 @@
 import axios from 'axios'
-axios.defaults.baseURL = 'https://localhost:7025'
+import param from '@/gpm_param'
+var axios_entity = axios.create({
+  baseURL: param.backend_host,
+})
 const VerticalControl = {
   Up: async () => {
-    var ret = await axios.get(`api/VerticalControl/Up`)
+    var ret = await axios_entity.get(`api/VerticalControl/Up`)
   },
   Down: async () => {
-    var ret = await axios.get(`api/VerticalControl/Down`)
+    var ret = await axios_entity.get(`api/VerticalControl/Down`)
   },
   Stop: async () => {
-    var ret = await axios.get(`api/VerticalControl/Stop`)
+    var ret = await axios_entity.get(`api/VerticalControl/Stop`)
   },
   Resume: async () => {
-    var ret = await axios.get(`api/VerticalControl/Resume`)
+    var ret = await axios_entity.get(`api/VerticalControl/Resume`)
   },
   Orig: async () => {
-    var ret = await axios.get(`api/VerticalControl/Orig`)
+    var ret = await axios_entity.get(`api/VerticalControl/Orig`)
   },
   Init: async () => {
-    var ret = await axios.get(`api/VerticalControl/Init`)
+    var ret = await axios_entity.get(`api/VerticalControl/Init`)
   },
   Pose: async (target = 0.0) => {
-    var ret = await axios.get(`api/VerticalControl/Pose?target=${target}`)
+    var ret = await axios_entity.get(
+      `api/VerticalControl/Pose?target=${target}`,
+    )
   },
 }
 

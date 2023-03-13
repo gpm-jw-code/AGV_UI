@@ -1,92 +1,238 @@
 <template>
-  <div class="home h-100">
+  <div class="home h-100" v-loading="loading">
     <div class="status d-flex flex-row">
-      <div class="sys-name flex-fill p-1">GPM AGVS System</div>
-      <div class="agvc-name flex-fill p-1">AGV 001</div>
-      <div class="account-name flex-fill p-1">Operator</div>
-      <div class="version-name flex-fill p-1">2.1.24</div>
+      <div class="sys-name bg-success flex-fill">GPM VMS</div>
+      <div class="agvc-name flex-fill">{{VMSData.CarName}}</div>
+      <div class="account-name flex-fill">{{Operator_role }}</div>
+      <div class="version-name flex-fill">{{ App_version }}</div>
     </div>
-    <div class="alarm-show p-1">Alarm</div>
+    <div
+      v-if="NewestAlarm!=undefined"
+      :class="NewestAlarm.Level=='Alarm'?'alarm-show p-1 bg-danger':'alarm-show p-1 bg-warning'"
+    >{{ $i18n.locale=='zh-TW'? NewestAlarm.CN: NewestAlarm.Description }}</div>
+    <div v-if="back_end_server_err" class="server-error py-1 border">
+      <i class="bi bi-exclamation-diamond"></i>
+      {{ server_err_state_text }}
+    </div>
+
     <div class="d-flex flex-row h-100">
+      <!--Side 左側邊-->
       <div class="side h-100">
-        <div class="opt-buttons d-flex flex-column">
+        <div class="opt-buttons px-1 py-1 d-flex flex-column">
           <b-button
+            :disabled="back_end_server_err"
             @click="AGVInitialize()"
-            v-bind:style="initBtnStyle"
-            class="mb-2 p-2"
-            squared
+            :variant="initBtnVariant"
+            class="mb-1 p-2"
             block
-          >初始化</b-button>
+          >
+            <b>{{$t('initialize') }}</b>
+          </b-button>
           <b-button
+            :disabled="back_end_server_err"
             @click="AGVResetAlarm()"
-            style="background-color: rgb(220, 53, 69)"
-            class="mb-2 p-2"
-            squared
+            class="mb-1 p-2"
             block
-          >異常排除</b-button>
+            :variant="alarmResetBtnVariant"
+          >
+            <b>{{$t('reset_alarm') }}</b>
+          </b-button>
           <b-button
+            :disabled="back_end_server_err"
             @click="AGVBuzzerOff()"
-            variant="light"
-            class="border mb-2 p-2"
-            squared
+            variant="outline-dark"
+            class="mb-1 p-2"
             block
-          >蜂鳴器關閉</b-button>
+          >
+            <b>{{$t('buzzer_off') }}</b>
+          </b-button>
           <b-button
-            @click="AGVRemoveCassette()"
-            variant="light"
-            class="border mb-2 p-2"
-            squared
+            :disabled="back_end_server_err"
+            @click="remove_CstData_ComfirmDialog_Show=true"
+            variant="outline-dark"
+            class="mb-1 p-2"
             block
-          >移除卡匣</b-button>
-          <b-button variant="light" class="border mb-2 p-2" squared block @click="ShowLogin()">登入</b-button>
+          >
+            <b>{{$t('cst-remove') }}</b>
+          </b-button>
+          <b-button
+            :disabled="back_end_server_err"
+            variant="outline-dark"
+            class="mb-1 p-2"
+            block
+            @click="ShowLogin()"
+          >
+            <b>{{LoginBtnText}}</b>
+          </b-button>
 
           <login ref="login"></login>
         </div>
-        <div class="modes p-2 text-start">
-          <div>Online Mode:</div>
-          <div>Auto Mode:</div>
+        <!--模式切換Switch-->
+        <div class="modes px-2 text-start">
+          <div class="d-flex flex-row">
+            <div class="mode-item-label py-2">Online Mode</div>
+            <el-switch
+              v-model="IsOnlineMode"
+              @click="OnlineModeSwitchHandle()"
+              width="75"
+              size="large"
+              inline-prompt
+              inactive-text="Offline"
+              active-text="Online"
+              active-color="rgb(40, 167, 69)"
+              inactive-color="rgb(220, 53, 69)"
+            ></el-switch>
+          </div>
+          <div class="d-flex flex-row">
+            <div class="mode-item-label py-2">Auto Mode</div>
+            <el-switch
+              v-model="IsAutoMode"
+              @click="AutoModeSwitchHandle()"
+              width="75"
+              size="large"
+              inline-prompt
+              inactive-text="Manual"
+              active-text="Auto"
+              active-color="rgb(40, 167, 69)"
+              inactive-color="rgb(220, 53, 69)"
+            ></el-switch>
+          </div>
         </div>
-        <div class="connection-status border m-2 p-3">
-          <h5>連線狀態</h5>
+        <div class="connection-status border m-2 p-3 py-1">
+          <h5>{{$t('connection-states') }}</h5>
           <connection_state></connection_state>
         </div>
 
-        <div class="battery border m-2 my-0 p-3">
-          <h5>電量</h5>
+        <div class="battery border m-2 my-0 p-3 py-1">
+          <h5>{{$t('battery-level')}}</h5>
           <battery></battery>
         </div>
-        <div class="mileage border m-2 p-3">
-          <h5>里程數</h5>
+        <div class="mileage border m-2 p-3 py-1">
+          <h5>{{$t('mileage')}}</h5>
           <mileage></mileage>
         </div>
         <div>
           <emo></emo>
         </div>
       </div>
+      <!--主要內容 TabControl-->
       <div class="flex-fill border p-3">
-        <b-tabs pills>
-          <b-tab title="狀態" active>
+        <b-tabs pills @activate-tab="TabChangedHandler">
+          <b-tab :title="$t('status')" active>
             <div class="mt-3 border p-1">
               <status_card :ModuleInformation="moduleInformation"></status_card>
             </div>
           </b-tab>
-          <b-tab title="異常紀錄">
+          <!--Alarm Table-->
+          <b-tab :title="$t('abnormal-record')">
             <div class="mt-3 border p-1">
               <alarm_warn_table></alarm_warn_table>
             </div>
           </b-tab>
-          <b-tab title="操作">
+          <b-tab :title="$t('operation')">
             <div class="mt-3 border p-1">
-              <agv_operator :ModuleInformation="moduleInformation"></agv_operator>
+              <agv_operator :operation_enabled="operation_enabled"></agv_operator>
+            </div>
+          </b-tab>
+          <b-tab :title="$t('3d_model')">
+            <div class="mt-3 border p-1">
+              <ForkAGV3D></ForkAGV3D>
+            </div>
+          </b-tab>
+          <b-tab title="Task">
+            <div class="mt-3 border p-1">
+              <TaskDeliveryVue></TaskDeliveryVue>
+            </div>
+          </b-tab>
+
+          <b-tab title="CST READER">
+            <div class="mt-3 border p-1">
+              <CSTReader></CSTReader>
             </div>
           </b-tab>
         </b-tabs>
+        <!--語系切換按鈕-->
+        <div class="lang-switch">
+          <jw_switch
+            @switch="LangChangeHandle"
+            :default="IsUseChinese"
+            active_text="CH"
+            inactive_text="EN"
+            inactive_color="rgb(8, 135, 150)"
+          ></jw_switch>
+          <!-- <el-switch
+            @change="LangChangeHandle"
+            v-model="IsUseChinese"
+            size="large"
+            active-text="CH"
+            inactive-text="EN"
+            active-color="rgb(40, 167, 69)"
+            inline-prompt
+            width="70"
+          ></el-switch>-->
+        </div>
       </div>
+    </div>
+    <!--對話框們-->
+    <div class="modals">
+      <!--等待上線動作完成對話框 -->
+      <b-modal
+        v-model="wait_online_request_dialog_show"
+        title="AGV Online Requesting"
+        :centered="true"
+        :hideFooter="true"
+        :noCloseOnBackdrop="true"
+        :noCloseOnEsc="true"
+        :hideHeaderClose="true"
+      >
+        <p class="py-3">{{$t('wait_online_text')}}</p>
+      </b-modal>
+
+      <!--模式切換確認對話框 -->
+      <b-modal
+        v-model="mode_switch_comfirmDialog"
+        :noCloseOnBackdrop="true"
+        :centered="true"
+        title="Mode Switch Confrim"
+        @ok="ModeSwitchHandler"
+      >
+        <p>確定要將模式切換為{{ModeSwitchDisplay}}?</p>
+      </b-modal>
+      <!--取消初始化對話框 -->
+      <b-modal
+        v-model="cancelInitComfirmDialogShow"
+        headerBgVariant="dark"
+        headerTextVariant="light"
+        :centered="true"
+        title="Cancel Initialze Process"
+        @ok="CancelInitProcessWorker"
+      >
+        <p>{{$t('cancel_init_action_notify')}}</p>
+      </b-modal>
+
+      <!--確認進行初始化對話框 -->
+      <b-modal
+        v-model="StartInitComfirmDialogShow"
+        headerBgVariant="dark"
+        headerTextVariant="light"
+        :centered="true"
+        title="Initialze"
+        @ok="InitializeWorker"
+      >
+        <p>{{$t('start_init_action_notify')}}</p>
+      </b-modal>
+      <!--確認移除卡匣在席資料對話框-->
+      <b-modal
+        v-model="remove_CstData_ComfirmDialog_Show"
+        :centered="true"
+        @ok="AGVRemoveCassette()"
+        title="CST Remove Confirm"
+      >
+        <p>確定要移除卡匣資料?</p>
+      </b-modal>
     </div>
   </div>
 </template>
-
-
 
 <script>
 import battery from '@/components/Battery.vue'
@@ -94,33 +240,103 @@ import mileage from '@/components/Mileage.vue'
 import emo from '@/components/EMOButton.vue'
 import status_card from "@/components/StatusInfoCard.vue"
 import alarm_warn_table from '@/components/AlarmWarningTable.vue'
-import agv_operator from '@/components/AgvOperator.vue'
+import agv_operator from '@/components/Operator/AgvOperator.vue'
 import login from '@/components/Login.vue'
 import connection_state from '@/components/ConnectionStates.vue'
-import { GetModuleInformation, Initialize, ResetAlarm, BuzzerOff, RemoveCassette } from '@/api/AGVS'
+import ForkAGV3D from '@/components/3DModel/ForkAGV3DModel.vue'
+import TaskDeliveryVue from '@/components/VMSTask/TaskDelivery.vue'
+import CSTReader from '@/components/CSTReaderView.vue'
+import { Initialize, CancelInitProcess, ResetAlarm, BuzzerOff, RemoveCassette, MODESwitcher } from '@/api/VMSAPI'
 
+import bus from '@/event-bus.js'
+import VMSData from '@/ViewModels/VMSData.js'
+import UserInfo from '@/ViewModels/UserInfo.js'
 import param from '@/gpm_param'
+import { version } from '@/gpm_param'
+import jw_switch from "@/components/UIComponents/jw-switch.vue"
+import Notifier from "@/api/NotifyHelper.js"
+import { duration } from 'moment'
+import { my_data } from "@/gpm_param"
 // @ is an alias to /src
 export default {
   name: 'HomeView',
   components: {
-    battery, mileage, emo, status_card, alarm_warn_table, agv_operator, login, connection_state
+    jw_switch, battery, mileage, emo, status_card, alarm_warn_table, agv_operator, login, connection_state, ForkAGV3D, TaskDeliveryVue, CSTReader
   },
   data() {
     return {
+      back_end_server_err: true,
+      loading: false,
       dialogTableVisible: false,
+      isInitializing: false,
+      cancelInitComfirmDialogShow: false,
+      StartInitComfirmDialogShow: false,
+      IsUseChinese: true,
+      wait_online_request_dialog_show: false,
+      mode_switch_comfirmDialog: false,
+      remove_CstData_ComfirmDialog_Show: false,
       moduleInformation: {},
-      initBtnBGColor: 'rgb(220, 53, 169)'
+      initBtnVariant: 'danger',
+      VMSData: new VMSData(),
+      Operator_role: 'Operator',
+      CurrentUserinfo: new UserInfo('', 0),
+      LoginBtnText: '登入',
+      server_err_state_text: '連線中...',
+      init_btn_blink_timer: null,
+      mode_switch_data: {
+        type: 'online', //auto
+        state: false
+      },
+      currentTabs: 0,
+      previous_tagID: -99,
     }
   },
   methods: {
+    LangChangeHandle(checked) {
+      this.IsUseChinese = checked;
+      this.$i18n.locale = this.IsUseChinese ? 'zh-TW' : 'en-US';
+      bus.emit('/lang_changed', this.$i18n.locale);
+      if (this.IsUseChinese) {
+        Notifier.Success("語言變更:中文", 'bottom', 800);
+      } else {
+        Notifier.Primary("Language:English", 'bottom', 800);
+      }
+    },
+    TabChangedHandler(currentTabs, previousTabs) {
+      this.currentTabs = currentTabs;
+      if (currentTabs == 1)
+        bus.emit('/alarmtable_tab_click')
+    },
     ShowLogin() {
       this.$refs.login.Show();
     },
     async AGVInitialize() {
+      if (this.isInitializing) {
+        this.cancelInitComfirmDialogShow = true;
+      }
+      else {
+        this.StartInitComfirmDialogShow = true;
+      }
+    },
+    async InitializeWorker() {
+      this.InitializingUI();
+      this.isInitializing = true;
+      var result = await Initialize();
+      this.isInitializing = false;
+      clearInterval(this.init_btn_blink_timer);
+      console.log(result)
+      if (result.Success) {
+        this.initBtnVariant = 'success'
+      } else {
+        this.initBtnVariant = 'danger'
+      }
+    },
+    async CancelInitProcessWorker() {
+      await CancelInitProcess()
+      clearInterval(this.init_btn_blink_timer);
+      this.initBtnVariant = 'danger'
+      this.isInitializing = false;
 
-      this.Initializing();
-      await Initialize();
     },
     async AGVResetAlarm() {
       await ResetAlarm();
@@ -130,36 +346,165 @@ export default {
     },
     async AGVRemoveCassette() {
       await RemoveCassette();
+      setTimeout(() => {
+        Notifier.Success("CST Data Already Clear", 'bottom', 1000);
+        this.remove_CstData_ComfirmDialog_Show = false;
+      }, 300);
     },
-    Initializing() {
-      this.initBtnBGColor = 'grey';
-      setInterval(() => {
-        if (this.initBtnBGColor != 'rgb(40, 167, 69)') {
-          this.initBtnBGColor = 'rgb(40, 167, 69)'
+    InitializingUI() {
+      this.init_btn_blink_timer = setInterval(() => {
+        if (this.initBtnVariant != 'success') {
+          this.initBtnVariant = 'success'
         } else {
-          this.initBtnBGColor = 'grey'
+          this.initBtnVariant = 'outline-success'
         }
       }, 500);
-    }
+    },
+    VMSDataWebsocketInit() {
+      // 使用WebSocket獲取數據
+      var ws_host = param.backend_host.replace('http', 'ws')
+      const socket = new WebSocket(`${ws_host}/ws/AGVCState`);
+      socket.onmessage = (event) => {
+
+        this.back_end_server_err = false;
+        this.VMSData = JSON.parse(event.data);
+
+        if (this.VMSData.Tag != this.previous_tagID && this.VMSData.Tag > 0) {
+          Notifier.Primary(`Tag Detected:${this.VMSData.Tag}`, 'bottom', 1500);
+        }
+        this.previous_tagID = this.VMSData.Tag;
+        if (!this.isInitializing) {
+          this.initBtnVariant = this.VMSData.IsInitialized ? "success" : "danger";
+        }
+        this.BusPublishDataOut();
+      };
+      socket.onclose = () => {
+        this.back_end_server_err = true;
+        this.server_err_state_text = "後端伺服器異常";
+        this.VMSDataWebsocketInit()
+      }
+      socket.onerror = () => {
+        this.server_err_state_text = "後端伺服器異常";
+        this.back_end_server_err = true;
+      }
+    },
+    BusPublishDataOut() {
+      bus.emit('/vms_data', this.VMSData);
+      bus.emit('/agv_current_tag', this.VMSData.Tag);
+      bus.emit('/battery', this.VMSData.BatteryStatus);
+      bus.emit('/mileage', this.VMSData.Mileage);
+      bus.emit('/zaxis_driver_state', this.VMSData.ZAxisDriverState)
+      bus.emit('/drivers_state', this.VMSData.DriversStates)
+      bus.emit('/z_axis_position', this.VMSData.ZAxisDriverState.position)
+    },
+    async AutoModeSwitchHandle() {
+      this.mode_switch_data.type = 'auto'
+      this.mode_switch_data.state = !this.IsAutoMode;
+      this.mode_switch_comfirmDialog = true;
+    },
+    async OnlineModeSwitchHandle() {
+      if (!this.IsOnlineMode && this.VMSData.MainState.toUpperCase() != 'IDLE') {
+        Notifier.Danger(`當前狀態無法上線(${this.VMSData.MainState})`, "top", 5000);
+        return;
+      }
+      this.mode_switch_data.type = 'online'
+      this.mode_switch_data.state = !this.IsOnlineMode;
+      this.mode_switch_comfirmDialog = true;
+
+    },
+    async ModeSwitchHandler() {
+      if (this.mode_switch_data.type == 'auto') {
+        var ret = await MODESwitcher.AutoModeSwitch(this.IsAutoMode ? 0 : 1)
+      } else {
+        this.wait_online_request_dialog_show = true;
+        var ret = await MODESwitcher.OnlineModeSwitch(this.IsOnlineMode ? 0 : 1)
+        //alert(ret)
+        setTimeout(() => {
+          this.wait_online_request_dialog_show = false;
+        }, 1000);
+      }
+      setTimeout(() => {
+        this.mode_switch_comfirmDialog = false;
+      }, 300);
+    },
   },
   computed: {
-    initBtnStyle() {
-      return {
-        backgroundColor: this.initBtnBGColor
+    alarmResetBtnVariant() {
+      return this.VMSData.AlarmCodes.length > 0 ? 'danger' : 'outline-dark'
+    },
+
+    IsAutoMode() {
+      return this.VMSData.AutoMode == 1;
+    },
+    IsOnlineMode() {
+      return this.VMSData.OnlineMode == 1;
+    },
+    operation_enabled() {
+      if (this.CurrentUserinfo.Role == 3)
+        return true;
+      else if (this.CurrentUserinfo.Role == 0) {
+        return false
+      } else {
+        return !this.IsAutoMode && !this.IsOnlineMode
+      }
+    },
+    App_version() {
+      return version;
+    },
+    NewestAlarm() {
+      if (this.VMSData.NewestAlarm == undefined) {
+        return undefined
+      }
+      return this.VMSData.NewestAlarm
+    },
+    ModeSwitchDisplay() {
+      if (this.mode_switch_data.type == 'online') {
+        return this.IsOnlineMode ? 'Offline' : 'Online'
+      } else {
+        return this.IsAutoMode ? 'Manual' : 'Auto'
       }
     }
   },
   mounted() {
-    setInterval(async () => {
-      this.moduleInformation = await GetModuleInformation();
-    }, 200);
-    alert(param.type)
-
+    // setInterval(async () => {
+    //   this.moduleInformation = await GetModuleInformation();
+    // }, 200);
+    this.VMSDataWebsocketInit();
+    bus.on('/login_success', (user_info) => {
+      this.CurrentUserinfo = user_info;
+      this.Operator_role = this.CurrentUserinfo.GetRoleName()
+      this.LoginBtnText = '登出'
+      Notifier.Success(`${this.CurrentUserinfo.UserName}(${this.CurrentUserinfo.Role}) Login Success`);
+    })
+    setTimeout(() => {
+      this.loading = false;
+    }, 3000);
   },
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.server-error {
+  animation: color-change 1s infinite;
+}
+@keyframes color-change {
+  0% {
+    background-color: red;
+    color: white;
+  }
+  50% {
+    background-color: rgb(255, 170, 170);
+    color: black;
+  }
+  100% {
+    background-color: red;
+    color: white;
+  }
+  // 100% {
+  //   background-color: red;
+  //   color: white;
+  // }
+}
 .status {
   .sys-name,
   .agvc-name,
@@ -168,10 +513,11 @@ export default {
     margin: auto 1px;
     color: white;
     font-weight: bold;
+    font-size: 27px;
+    // letter-spacing: 2px;
   }
 
   .sys-name {
-    background-color: rgb(40, 167, 69);
     margin-left: 0;
   }
   .agvc-name {
@@ -188,12 +534,30 @@ export default {
 
 .alarm-show {
   background-color: rgb(248, 215, 218);
+  font-weight: bold;
+  color: white;
 }
 
+.modes {
+  .mode-item-label {
+    width: 120px;
+    font-weight: bold;
+  }
+}
 .side {
   width: 250px;
   h5 {
     font-weight: bold;
   }
+}
+.lang-switch {
+  // background-color: red;
+  width: 100px;
+  height: 50px;
+  position: absolute;
+  right: 13px;
+  top: 75px;
+  padding: 2px;
+  align-items: center;
 }
 </style>

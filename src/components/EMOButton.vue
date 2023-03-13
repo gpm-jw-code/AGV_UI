@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { EMO } from '@/api/AGVS'
+import { EMO } from '@/api/VMSAPI'
 export default {
 
   methods: {

@@ -1,27 +1,60 @@
 <template>
   <div class="battery d-flex flex-row">
-    <i class="bi bi-battery-full"></i>
+    <i v-if="battery_status.IsCharging" style="color:green" class="bi bi-battery-charging"></i>
+    <i v-else :class="'bi bi-battery-full'" :style="{color:IsLowBatteryLevel?'red':'black'}"></i>
     <b-progress class="flex-fill" :max="max" animated>
-      <b-progress-bar :value="value" :label="`${((value / max) * 100).toFixed(2)}%`"></b-progress-bar>
+      <b-progress-bar
+        v-bind:class="battery_state_bg"
+        :value="battery_level"
+        :label="`${((battery_level / max) * 100).toFixed(2)}%`"
+      ></b-progress-bar>
     </b-progress>
+  </div>
+  <div v-if="battery_status.IsCharging" class="d-flex flex-row float-right">
+    <div>{{ $t('charging_current') }}:</div>
+    <div>{{ battery_status.ChargeCurrent }}</div>
   </div>
 </template>
 
 <script>
-import { GetBatteryState } from '@/api/AGVS';
+import { GetBatteryState } from '@/api/VMSAPI';
+import bus from '@/event-bus.js'
+import BatteryStatus from '@/ViewModels/BatteryStatus';
 export default {
   data() {
     return {
       max: 100,
-      value: 60
+      battery_status: new BatteryStatus()
     }
   },
 
+  computed: {
+    battery_level() {
+      return this.battery_status.BatteryLevel;
+    },
+    battery_state_bg() {
+      if (this.battery_status.IsCharging)
+        return "bg-success"
+      if (this.battery_level > 60)
+        return "bg-success"
+      if (this.battery_level <= 60 && this.battery_level >= 30)
+        return "bg-warning"
+      else
+        return "bg-danger"
+    },
+    IsLowBatteryLevel() {
+      return this.battery_level < 30
+    }
+  },
   mounted() {
-    setInterval(async () => {
-      var betteryState = await GetBatteryState();
-      this.value = betteryState.batteryLevel;
-    }, 1000);
+    // setInterval(async () => {
+    //   var betteryState = await GetBatteryState();
+    //   this.value = betteryState.batteryLevel;
+    // }, 1000);
+
+    bus.on('/battery', (battery_status) => {
+      this.battery_status = battery_status
+    })
   },
 
 }
