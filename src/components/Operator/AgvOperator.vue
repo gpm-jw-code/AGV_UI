@@ -45,14 +45,12 @@
       v-model="modalShow"
       title="Administartor"
       :centered="true"
+      :no-close-on-backdrop="true"
       @ok="AdminSwitchDialogResultHandle(true)"
       @cancel="AdminSwitchDialogResultHandle(false)"
+      @hidden=" version_text_click_count = 0;modalShow=false"
     >
       <p>Do You Known What Are You Doing?</p>
-      <!-- <div class="admin-dialog-buttons">
-        <button @click="AdminSwitchDialogResultHandle(true)" class="yes-btn">YES</button>
-        <button @click="AdminSwitchDialogResultHandle(false)" class="no-btn">NO</button>
-      </div>-->
     </b-modal>
   </div>
 </template>
@@ -102,12 +100,12 @@ export default {
     },
     VersionTextClickHandle() {
       this.version_text_click_count += 1;
-      if (this.version_text_click_count >= this.trigger_admin_dialog_count) {
-        this.version_text_click_count = 0;
+      if (this.version_text_click_count > this.trigger_admin_dialog_count) {
         this.modalShow = true;
       }
     },
     AdminSwitchDialogResultHandle(checked = false) {
+      this.version_text_click_count = 0;
       this.isGodMode = checked;
       setTimeout(() => {
         this.modalShow = false;
