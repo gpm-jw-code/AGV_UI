@@ -14,9 +14,9 @@ export default {
     }
   },
   mounted() {
-    setInterval(() => {
-      this.fetchImage();
-    }, 1000);;
+    // setInterval(() => {
+    //   this.fetchImage();
+    // }, 1000);;
   },
   methods: {
     async fetchImage() {

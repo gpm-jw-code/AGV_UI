@@ -5,10 +5,10 @@ var axios_entity = axios.create({
 })
 const VerticalControl = {
   Up: async () => {
-    var ret = await axios_entity.get(`api/VerticalControl/Up`)
+    var ret = await axios_entity.get(`api/VerticalControl/Up_Jog`)
   },
   Down: async () => {
-    var ret = await axios_entity.get(`api/VerticalControl/Down`)
+    var ret = await axios_entity.get(`api/VerticalControl/Down_Jog`)
   },
   Stop: async () => {
     var ret = await axios_entity.get(`api/VerticalControl/Stop`)
@@ -26,6 +26,12 @@ const VerticalControl = {
     var ret = await axios_entity.get(
       `api/VerticalControl/Pose?target=${target}`,
     )
+  },
+  SetTagHeightLimit: async (tag_id, pose_loc, layer, pose) => {
+    var ret = await axios_entity.get(
+      `api/VerticalControl/SetTagHeightLimit?tag_id=${tag_id}&pose_loc=${pose_loc}&layer=${layer}&pose=${pose}`,
+    )
+    return ret.data
   },
 }
 

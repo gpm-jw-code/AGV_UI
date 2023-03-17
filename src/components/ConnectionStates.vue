@@ -45,6 +45,8 @@
 
 <script>
 import param from '@/gpm_param'
+import WebSocketHelp from '@/api/WebSocketHepler'
+
 export default {
   data() {
     return {
@@ -70,15 +72,13 @@ export default {
   methods: {
     WebSocketConnect() {
 
-      var _ws = new WebSocket(`${param.backend_host.replace('http', 'ws')}/ws/ConnectionState`)
-      _ws.onopen = (ws) => {
-        console.log('opened');
-        _ws.onmessage = (ws, ev) => {
-          var data = JSON.parse(ws.data)
-          this.connections = data;
-        }
+      var _ws = new WebSocketHelp('ws/ConnectionState');
+      _ws.Connect();
+      _ws.wssocket.onmessage = (ev) => {
+        var data = JSON.parse(ev.data)
+        this.connections = data;
       }
-      _ws.onclose = () => {
+      _ws.wssocket.onclose = () => {
         this.connections.RosbridgeServer = this.connections.AGVC = 'DISCONNECT';
         this.WebSocketConnect();
         console.log('ws/ConnectionState close');

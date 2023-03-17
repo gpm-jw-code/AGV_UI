@@ -255,8 +255,7 @@ import param from '@/gpm_param'
 import { version } from '@/gpm_param'
 import jw_switch from "@/components/UIComponents/jw-switch.vue"
 import Notifier from "@/api/NotifyHelper.js"
-import { duration } from 'moment'
-import { my_data } from "@/gpm_param"
+import WebSocketHelp from '@/api/WebSocketHepler'
 // @ is an alias to /src
 export default {
   name: 'HomeView',
@@ -361,9 +360,10 @@ export default {
       }, 500);
     },
     VMSDataWebsocketInit() {
-      // 使用WebSocket獲取數據
-      var ws_host = param.backend_host.replace('http', 'ws')
-      const socket = new WebSocket(`${ws_host}/ws/AGVCState`);
+      var ws = new WebSocketHelp('ws/AGVCState');
+      ws.Connect();
+      console.info('abcv');
+      var socket = ws.wssocket;
       socket.onmessage = (event) => {
 
         this.back_end_server_err = false;
@@ -403,7 +403,7 @@ export default {
       this.mode_switch_comfirmDialog = true;
     },
     async OnlineModeSwitchHandle() {
-      if (!this.IsOnlineMode && this.VMSData.MainState.toUpperCase() != 'IDLE') {
+      if (!this.IsOnlineMode && this.VMSData.MainState.toUpperCase() != 'IDLE' && this.VMSData.MainState.toUpperCase() != 'CHARGING') {
         Notifier.Danger(`當前狀態無法上線(${this.VMSData.MainState})`, "top", 5000);
         return;
       }

@@ -24,7 +24,7 @@
             :readonly="false"
             digital_type="output"
             :enabled="operation_enabled_return"
-            :super_user ="isGodMode"
+            :super_user="isGodMode"
             :table_data="DIOTableData.Outputs"
           ></IOTable>
         </div>
@@ -65,6 +65,8 @@ import IOTable from './IOTable.vue';
 import param from '@/gpm_param';
 import clsDIOTable from '@/ViewModels/clsDIOTable';
 import ManualSettings from './ManualSettings.vue';
+import WebSocketHelp from '@/api/WebSocketHepler'
+
 export default {
 
   components: {
@@ -88,14 +90,13 @@ export default {
   methods: {
     DIOTableWSInit() {
 
-      var ws_host = param.backend_host.replace('http', 'ws')
-      var ws = new WebSocket(`${ws_host}/ws/DIOTableData`)
-      ws.onopen = () => {
-        ws.onmessage = (evt) => {
-          this.DIOTableData = JSON.parse(evt.data)
-        }
+      var ws = new WebSocketHelp('ws/DIOTableData')
+      ws.Connect();
+
+      ws.wssocket.onmessage = (evt) => {
+        this.DIOTableData = JSON.parse(evt.data)
       }
-      ws.onclose = () => {
+      ws.wssocket.onclose = () => {
         this.DIOTableWSInit()
       }
     },

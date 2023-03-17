@@ -16,6 +16,9 @@
           <div class="label-item">Current Position</div>
           <el-input size="small" style="width:72px" class="py-1" center v-model="position" disabled></el-input>
         </div>
+        <div v-if="true" class="p-2 my-2 border rounded">
+          <ZaxisPoseSetting></ZaxisPoseSetting>
+        </div>
       </div>
       <!-- <el-divider direction="vertical"></el-divider> -->
       <div class="control-buttons mx-2">
@@ -78,8 +81,12 @@
 
 <script>
 import VerticalControl from '@/api/VerticalControlAPI';
+import ZaxisPoseSetting from './ZaxisPoseSetting.vue';
 import bus from '@/event-bus'
 export default {
+  components: {
+    ZaxisPoseSetting,
+  },
   props: {
     enabled: {
       type: Boolean,
