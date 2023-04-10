@@ -29,7 +29,7 @@
           <tr align="justify">
             <td>{{$t('action_name')}}</td>
             <td class="val-column">
-              <b-form-input size="sm" disabled v-model="currentPosition"></b-form-input>
+              <b-form-input size="sm" disabled v-model="vms_data.ZAxisActionName"></b-form-input>
             </td>
             <td>{{$t('carrier_id')}}</td>
             <td class="val-column">

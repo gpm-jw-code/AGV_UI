@@ -1,12 +1,49 @@
 <template>
-  <!-- <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>-->
-  <router-view />
+  <i @click="ToggleMenu" v-show="showMenuToggleIcon" class="bi bi-list menu-toggle-icon"></i>
+  <SideMenuDrawer ref="side_menu"></SideMenuDrawer>
+  <router-view v-slot="{ Component }">
+    <keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+  </router-view>
 </template>
 
+<script>
+import bus from '@/event-bus.js'
+import SideMenuDrawer from '@/views/SideMenuDrawer.vue'
+export default {
+  components: {
+    SideMenuDrawer,
+  },
+  data() {
+    return {
+      showMenuToggleIcon: false,
+    }
+  },
+  methods: {
+    ToggleMenu() {
+      this.$refs.side_menu.Show();
+    }
+  },
+  mounted() {
+    bus.on('/god_mode_changed', (is_god_mode_now) => {
+      this.showMenuToggleIcon = is_god_mode_now
+    });
+    if (process.env.NODE_ENV != 'production') {
+      this.showMenuToggleIcon = true;
+    }
+  },
+};
+</script>
+
 <style lang="scss">
+.menu-toggle-icon {
+  position: absolute;
+  left: 0;
+  font-size: 26px;
+  cursor: pointer;
+}
+
 #app {
   //font-family: Avenir, Helvetica, Arial, sans-serif;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,

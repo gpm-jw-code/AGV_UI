@@ -1,7 +1,10 @@
 <template>
   <div class="home h-100" v-loading="loading">
     <div class="status d-flex flex-row">
-      <div class="sys-name bg-success flex-fill">GPM VMS</div>
+      <div class="sys-name bg-success flex-fill d-flex flex-row justify-content-center">
+        <div>GPM AGV</div>
+        <div v-if="VMSData.Simulation" class="simulation-mode p-1 mx-2">SIMULATION</div>
+      </div>
       <div class="agvc-name flex-fill">{{VMSData.CarName}}</div>
       <div class="account-name flex-fill">{{Operator_role }}</div>
       <div class="version-name flex-fill">{{ App_version }}</div>
@@ -288,6 +291,7 @@ export default {
       },
       currentTabs: 0,
       previous_tagID: -99,
+      ws: null
     }
   },
   methods: {
@@ -387,6 +391,7 @@ export default {
         this.server_err_state_text = "後端伺服器異常";
         this.back_end_server_err = true;
       }
+      this.ws = ws;
     },
     BusPublishDataOut() {
       bus.emit('/vms_data', this.VMSData);
@@ -476,14 +481,26 @@ export default {
       this.LoginBtnText = '登出'
       Notifier.Success(`${this.CurrentUserinfo.UserName}(${this.CurrentUserinfo.Role}) Login Success`);
     })
+
+
     setTimeout(() => {
       this.loading = false;
     }, 3000);
   },
+  destroyed() {
+    alert('destroy')
+    if (this.ws) {
+      this.ws.Close();
+    }
+  }
 }
 </script>
 
 <style lang="scss" scoped>
+.simulation-mode {
+  font-size: 20px;
+  animation: color-change 1s infinite;
+}
 .server-error {
   animation: color-change 1s infinite;
 }

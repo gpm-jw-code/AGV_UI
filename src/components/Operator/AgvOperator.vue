@@ -64,7 +64,7 @@ import param from '@/gpm_param';
 import clsDIOTable from '@/ViewModels/clsDIOTable';
 import ManualSettings from './ManualSettings.vue';
 import WebSocketHelp from '@/api/WebSocketHepler'
-
+import bus from '@/event-bus.js'
 export default {
 
   components: {
@@ -107,6 +107,7 @@ export default {
     AdminSwitchDialogResultHandle(checked = false) {
       this.version_text_click_count = 0;
       this.isGodMode = checked;
+      bus.emit('/god_mode_changed', checked);
       setTimeout(() => {
         this.modalShow = false;
       }, 100);

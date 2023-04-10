@@ -1,8 +1,12 @@
 import param from '@/gpm_param'
+import bus from '@/event-bus'
 var backend_ws_host = param.backend_host.replace('http', 'ws')
 
 class WebSocketHelp {
   constructor(ws_path, ws_host) {
+    bus.on('/ws_force_close', () => {
+      this.Close()
+    })
     this.ws_path = ws_path
     if (ws_host == undefined) {
       this.ws_url = `${backend_ws_host}/${this.ws_path}`
@@ -18,29 +22,19 @@ class WebSocketHelp {
       console.info('ws opened')
       this.SendAliveCheck()
     }
-    // socket.onmessage = (event) => {
-    //   var Data = JSON.parse(event.data)
-
-    //   console.info(`Data Receievd : ${Data}`)
-    // }
-    // socket.onclose = () => {
-    //   console.info('ws clsoed')
-    // }
-    // socket.onerror = () => {
-    //   console.info('ws error')
-    // }
-    console.info('123')
     this.wssocket = socket
   }
 
   Close() {
+    clearInterval(this.alive_check_timer)
+
     if (this.wssocket) {
       this.wssocket.close()
     }
   }
 
   SendAliveCheck() {
-    setInterval(() => {
+    this.alive_check_timer = setInterval(() => {
       this.wssocket.send('alive')
     }, 1000)
   }

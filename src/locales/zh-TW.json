@@ -31,7 +31,7 @@
     "cancel_init_action_notify":"確定要取消初始化動作?",
     "start_init_action_notify":"確定要進行初始化動作? 初始化動作開始後 Fork 將會下降,請確認 Fork上有無貨物，並確認 AGV 周圍無障礙物",
     "charging_current":"充電電流",
-    "wait_online_text":"AGV正在執行上線請求，請稍後...",
+    "wait_online_text":"AGV正在執行上下線請求，請稍後...",
     "refresh":"重新整理",
     "clear_alarm_records":"清除異常紀錄"
 }
