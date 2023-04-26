@@ -10,7 +10,7 @@
           </td>
           <td>
             <div>
-              <i v-bind:class="agvc_state" class="bi bi-circle-fill"></i> VMS
+              <i v-bind:class="vms_state" class="bi bi-circle-fill"></i> VMS
             </div>
           </td>
         </tr>
@@ -26,6 +26,7 @@
             </div>
           </td>
         </tr>
+
         <!-- <tr>
           <td>
             <div :class="rosbridge_state">
@@ -65,6 +66,12 @@ export default {
     agvc_state() {
       if (this.connections.AGVC != undefined)
         return this.connections.AGVC.toLocaleLowerCase()
+      else
+        return 'disconnect'
+    },
+    vms_state() {
+      if (this.connections.VMS != undefined)
+        return this.connections.VMS.toLocaleLowerCase()
       else
         return 'disconnect'
     },

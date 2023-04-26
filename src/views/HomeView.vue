@@ -153,7 +153,7 @@
               <agv_operator :agv_type="VMSData.Agv_Type" :operation_enabled="operation_enabled"></agv_operator>
             </div>
           </b-tab>
-          <b-tab :title="$t('3d_model')">
+          <b-tab v-if="false" :title="$t('3d_model')">
             <div class="mt-3 border p-1">
               <ForkAGV3D></ForkAGV3D>
             </div>
