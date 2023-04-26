@@ -9,6 +9,9 @@ export class clsForkTesetOption {
   up_limit_pose = 120.0
   down_limit_pose = 0.0
   speed = 1.0
+  useRandomPose = true
+  initalizeBeforeTest = false
+  pauseWhenReachQuarter = true
 }
 export class clsForkTestState {}
 
@@ -20,6 +23,10 @@ let FORKTEST = {
   },
   async Abort() {
     var ret = await axios_entity.post('/api/RDTEST/fork_test/abort')
+    return ret.data
+  },
+  async Continue() {
+    var ret = await axios_entity.post('/api/RDTEST/fork_test/continue')
     return ret.data
   },
 }

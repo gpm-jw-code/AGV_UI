@@ -1,9 +1,11 @@
 import clsDriverState from './clsDriverState'
 import BatteryStatus from './BatteryStatus'
 class VMSData {
+  Agv_Type = 0
   Simulation = false
   MainState = 'DOWN'
   IsInitialized = false
+  IsSystemIniting = false
   OnlineMode = 0
   AutoMode = 0
   CarName = 'AGV_'

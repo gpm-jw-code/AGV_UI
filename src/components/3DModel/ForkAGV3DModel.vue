@@ -101,7 +101,7 @@ export default {
       })
       var fork = new THREE.Mesh(geometry, material);
       fork.name = 'fork'
-      fork.position.set(0, 0, this.ZAxisHeight + this.ForkDepth);
+      fork.position.set(0, 0, this.ZAxisHeight + this.ForkDepth * 2);
 
       return fork;
     },
@@ -157,7 +157,7 @@ export default {
       scene.add(light);
 
 
-      const camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.1, 3100);
+      const camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.2, 2100);
       camera.position.set(0, 520, 270);
       camera.up.set(0, -1, 0)
       camera.lookAt(120, 120, 0);
@@ -177,7 +177,9 @@ export default {
       })
       scene.background = new THREE.Color(0xFFFFFF);
       scene.rotation.z = Math.PI / 3;
-      camera.zoom = 0.1
+      scene.position.y = 160;
+      scene.position.z = -10;
+      camera.zoom = 0.2
       this.scene = scene;
       this.renderer = renderer;
       this.camera = camera;
@@ -205,8 +207,8 @@ export default {
     document.getElementById('my-three')?.appendChild(domElement)
 
     setInterval(() => {
-      this.forkMesh.position.z = this.ZAxisHeight;
-      this.carrierMesh.position.z = this.ZAxisHeight + (this.CarrierHeight / 2) + (this.ForkDepth / 2);
+      this.forkMesh.position.z = this.ZAxisHeight + 20;
+      this.carrierMesh.position.z = this.ZAxisHeight + 20+ (this.CarrierHeight / 2) + (this.ForkDepth / 2);
     }, 100);
 
   },

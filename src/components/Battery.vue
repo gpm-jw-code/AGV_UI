@@ -4,6 +4,7 @@
     <i v-else :class="'bi bi-battery-full'" :style="{color:IsLowBatteryLevel?'red':'black'}"></i>
     <b-progress class="flex-fill" :max="max" animated>
       <b-progress-bar
+        animated
         v-bind:class="battery_state_bg"
         :value="battery_level"
         :label="`${((battery_level / max) * 100).toFixed(2)}%`"
@@ -34,9 +35,9 @@ export default {
     },
     battery_state_bg() {
       if (this.battery_status.IsCharging)
-        return "bg-success"
+        return "full-state"
       if (this.battery_level > 60)
-        return "bg-success"
+        return "full-state"
       if (this.battery_level <= 60 && this.battery_level >= 30)
         return "bg-warning"
       else
@@ -67,6 +68,9 @@ export default {
     position: relative;
     top: -11px;
     margin-right: 4px;
+  }
+  .full-state {
+    background-color: rgb(13, 110, 253);
   }
 }
 </style>

@@ -8,21 +8,21 @@
               <i :class="'bi bi-circle-fill'"></i> UI Server
             </div>
           </td>
-          <!-- <td>
-            <div :class="agvc_state">
-              <i class="bi bi-circle-fill"></i> AGVC
+          <td>
+            <div>
+              <i v-bind:class="agvc_state" class="bi bi-circle-fill"></i> VMS
             </div>
-          </td>-->
+          </td>
         </tr>
         <tr>
           <td>
-            <div :class="rosbridge_state">
-              <i :class="'bi bi-circle-fill'"></i> ROS
+            <div>
+              <i v-bind:class="rosbridge_state" class="bi bi-circle-fill"></i> ROS
             </div>
           </td>
           <td>
-            <div :class="agvc_state">
-              <i class="bi bi-circle-fill"></i> VMS
+            <div>
+              <i v-bind:class="wago_state" class="bi bi-circle-fill"></i> WAGO
             </div>
           </td>
         </tr>
@@ -67,6 +67,12 @@ export default {
         return this.connections.AGVC.toLocaleLowerCase()
       else
         return 'disconnect'
+    },
+    wago_state() {
+      if (this.connections.WAGO != undefined)
+        return this.connections.WAGO.toLocaleLowerCase()
+      else
+        return 'disconnect'
     }
   },
   methods: {
@@ -100,7 +106,9 @@ export default {
   .connected {
     color: seagreen;
   }
-
+  .connecting {
+    color: yellow;
+  }
   td div {
     text-align: left;
   }

@@ -3,7 +3,7 @@
     <div class="status d-flex flex-row">
       <div class="sys-name bg-success flex-fill d-flex flex-row justify-content-center">
         <div>GPM AGV</div>
-        <div v-if="VMSData.Simulation" class="simulation-mode p-1 mx-2">SIMULATION</div>
+        <!-- <div v-if="VMSData.Simulation" class="simulation-mode p-1 mx-2">SIMULATION</div> -->
       </div>
       <div class="agvc-name flex-fill">{{VMSData.CarName}}</div>
       <div class="account-name flex-fill">{{Operator_role }}</div>
@@ -23,14 +23,24 @@
       <div class="side h-100">
         <div class="opt-buttons px-1 py-1 d-flex flex-column">
           <b-button
-            :disabled="back_end_server_err"
+            :disabled="back_end_server_err||VMSData.IsSystemIniting"
+            @click="AGVInitialize()"
+            class="mb-1 p-2"
+            v-bind:class="VMSData.MainState.toLowerCase()"
+            block
+          >
+            <b>{{$t('initialize') }}</b>
+          </b-button>
+          <!-- <b-button
+            :disabled="back_end_server_err||VMSData.IsSystemIniting"
             @click="AGVInitialize()"
             :variant="initBtnVariant"
             class="mb-1 p-2"
             block
           >
             <b>{{$t('initialize') }}</b>
-          </b-button>
+          </b-button>-->
+
           <b-button
             :disabled="back_end_server_err"
             @click="AGVResetAlarm()"
@@ -76,13 +86,14 @@
             <div class="mode-item-label py-2">Online Mode</div>
             <el-switch
               v-model="IsOnlineMode"
-              @click="OnlineModeSwitchHandle()"
+              @click.prevent="OnlineModeSwitchHandle()"
+              :disabled="back_end_server_err||VMSData.IsSystemIniting"
               width="75"
               size="large"
               inline-prompt
               inactive-text="Offline"
               active-text="Online"
-              active-color="rgb(40, 167, 69)"
+              active-color="rgb(13, 110, 253)"
               inactive-color="rgb(220, 53, 69)"
             ></el-switch>
           </div>
@@ -90,13 +101,14 @@
             <div class="mode-item-label py-2">Auto Mode</div>
             <el-switch
               v-model="IsAutoMode"
-              @click="AutoModeSwitchHandle()"
+              @click.stop.prevent="AutoModeSwitchHandle()"
+              :disabled="back_end_server_err||VMSData.IsSystemIniting"
               width="75"
               size="large"
               inline-prompt
               inactive-text="Manual"
               active-text="Auto"
-              active-color="rgb(40, 167, 69)"
+              active-color="rgb(13, 110, 253)"
               inactive-color="rgb(220, 53, 69)"
             ></el-switch>
           </div>
@@ -115,7 +127,7 @@
           <mileage></mileage>
         </div>
         <div>
-          <emo></emo>
+          <emo :disabled="back_end_server_err"></emo>
         </div>
       </div>
       <!--主要內容 TabControl-->
@@ -134,7 +146,7 @@
           </b-tab>
           <b-tab :title="$t('operation')">
             <div class="mt-3 border p-1">
-              <agv_operator :operation_enabled="operation_enabled"></agv_operator>
+              <agv_operator :agv_type="VMSData.Agv_Type" :operation_enabled="operation_enabled"></agv_operator>
             </div>
           </b-tab>
           <b-tab :title="$t('3d_model')">
@@ -142,13 +154,13 @@
               <ForkAGV3D></ForkAGV3D>
             </div>
           </b-tab>
-          <b-tab title="Task">
+          <b-tab v-if="false" title="Task">
             <div class="mt-3 border p-1">
               <TaskDeliveryVue></TaskDeliveryVue>
             </div>
           </b-tab>
 
-          <b-tab title="CST READER">
+          <b-tab v-if="false" title="CST READER">
             <div class="mt-3 border p-1">
               <CSTReader></CSTReader>
             </div>
@@ -160,6 +172,7 @@
             @switch="LangChangeHandle"
             :default="IsUseChinese"
             active_text="CH"
+            active_color="rgb(13, 110, 253)"
             inactive_text="EN"
             inactive_color="rgb(8, 135, 150)"
           ></jw_switch>
@@ -187,10 +200,22 @@
         :noCloseOnBackdrop="true"
         :noCloseOnEsc="true"
         :hideHeaderClose="true"
+        header-bg-variant="primary"
+        header-text-variant="light"
       >
         <p class="py-3">{{$t('wait_online_text')}}</p>
       </b-modal>
-
+      <!--上線失敗警示對話框-->
+      <b-modal
+        v-model="ShowOnlineFailDialog"
+        header-bg-variant="danger"
+        header-text-variant="light"
+        :centered="true"
+        title="上線請求失敗"
+        :ok-only="true"
+      >
+        <p ref="online-fail-msg"></p>
+      </b-modal>
       <!--模式切換確認對話框 -->
       <b-modal
         v-model="mode_switch_comfirmDialog"
@@ -198,14 +223,16 @@
         :centered="true"
         title="Mode Switch Confrim"
         @ok="ModeSwitchHandler"
+        header-bg-variant="primary"
+        header-text-variant="light"
       >
         <p>確定要將模式切換為{{ModeSwitchDisplay}}?</p>
       </b-modal>
       <!--取消初始化對話框 -->
       <b-modal
         v-model="cancelInitComfirmDialogShow"
-        headerBgVariant="dark"
-        headerTextVariant="light"
+        header-bg-variant="primary"
+        header-text-variant="light"
         :centered="true"
         title="Cancel Initialze Process"
         @ok="CancelInitProcessWorker"
@@ -216,8 +243,8 @@
       <!--確認進行初始化對話框 -->
       <b-modal
         v-model="StartInitComfirmDialogShow"
-        headerBgVariant="dark"
-        headerTextVariant="light"
+        header-bg-variant="primary"
+        header-text-variant="light"
         :centered="true"
         title="Initialze"
         @ok="InitializeWorker"
@@ -230,6 +257,8 @@
         :centered="true"
         @ok="AGVRemoveCassette()"
         title="CST Remove Confirm"
+        header-bg-variant="primary"
+        header-text-variant="light"
       >
         <p>確定要移除卡匣資料?</p>
       </b-modal>
@@ -277,8 +306,8 @@ export default {
       wait_online_request_dialog_show: false,
       mode_switch_comfirmDialog: false,
       remove_CstData_ComfirmDialog_Show: false,
+      ShowOnlineFailDialog: false,
       moduleInformation: {},
-      initBtnVariant: 'danger',
       VMSData: new VMSData(),
       Operator_role: 'Operator',
       CurrentUserinfo: new UserInfo('', 0),
@@ -314,7 +343,7 @@ export default {
       this.$refs.login.Show();
     },
     async AGVInitialize() {
-      if (this.isInitializing) {
+      if (VMSData.isInitializing) {
         this.cancelInitComfirmDialogShow = true;
       }
       else {
@@ -322,22 +351,13 @@ export default {
       }
     },
     async InitializeWorker() {
-      this.InitializingUI();
       this.isInitializing = true;
       var result = await Initialize();
-      this.isInitializing = false;
-      clearInterval(this.init_btn_blink_timer);
-      console.log(result)
-      if (result.Success) {
-        this.initBtnVariant = 'success'
-      } else {
-        this.initBtnVariant = 'danger'
-      }
+
     },
     async CancelInitProcessWorker() {
       await CancelInitProcess()
       clearInterval(this.init_btn_blink_timer);
-      this.initBtnVariant = 'danger'
       this.isInitializing = false;
 
     },
@@ -354,15 +374,7 @@ export default {
         this.remove_CstData_ComfirmDialog_Show = false;
       }, 300);
     },
-    InitializingUI() {
-      this.init_btn_blink_timer = setInterval(() => {
-        if (this.initBtnVariant != 'success') {
-          this.initBtnVariant = 'success'
-        } else {
-          this.initBtnVariant = 'outline-success'
-        }
-      }, 500);
-    },
+
     VMSDataWebsocketInit() {
       var ws = new WebSocketHelp('ws/AGVCState');
       ws.Connect();
@@ -377,9 +389,6 @@ export default {
           Notifier.Primary(`Tag Detected:${this.VMSData.Tag}`, 'bottom', 1500);
         }
         this.previous_tagID = this.VMSData.Tag;
-        if (!this.isInitializing) {
-          this.initBtnVariant = this.VMSData.IsInitialized ? "success" : "danger";
-        }
         this.BusPublishDataOut();
       };
       socket.onclose = () => {
@@ -402,12 +411,12 @@ export default {
       bus.emit('/drivers_state', this.VMSData.DriversStates)
       bus.emit('/z_axis_position', this.VMSData.ZAxisDriverState.position)
     },
-    async AutoModeSwitchHandle() {
+    AutoModeSwitchHandle() {
       this.mode_switch_data.type = 'auto'
       this.mode_switch_data.state = !this.IsAutoMode;
       this.mode_switch_comfirmDialog = true;
     },
-    async OnlineModeSwitchHandle() {
+    OnlineModeSwitchHandle() {
       if (!this.IsOnlineMode && this.VMSData.MainState.toUpperCase() != 'IDLE' && this.VMSData.MainState.toUpperCase() != 'CHARGING') {
         Notifier.Danger(`當前狀態無法上線(${this.VMSData.MainState})`, "top", 5000);
         return;
@@ -423,7 +432,12 @@ export default {
       } else {
         this.wait_online_request_dialog_show = true;
         var ret = await MODESwitcher.OnlineModeSwitch(this.IsOnlineMode ? 0 : 1)
-        //alert(ret)
+        if (!ret.Success) {
+          this.$refs['online-fail-msg'].innerText = ret.Message;
+          this.ShowOnlineFailDialog = true;
+
+        }
+
         setTimeout(() => {
           this.wait_online_request_dialog_show = false;
         }, 1000);
@@ -565,6 +579,43 @@ export default {
   width: 250px;
   h5 {
     font-weight: bold;
+  }
+  .opt-buttons {
+    font-weight: bold;
+    .stop,
+    .alarm,
+    .down {
+      background-color: rgb(220, 53, 69);
+    }
+    .initialize {
+      animation: initializing-color-change 1s infinite;
+    }
+    .idle,
+    .run,
+    .charging,
+    .working,
+    .warning {
+      background-color: rgb(13, 110, 253);
+    }
+
+    @keyframes initializing-color-change {
+      0% {
+        background-color: rgb(13, 110, 253);
+        color: white;
+      }
+      50% {
+        background-color: white;
+        color: rgb(13, 110, 253);
+      }
+      100% {
+        background-color: rgb(13, 110, 253);
+        color: white;
+      }
+      // 100% {
+      //   background-color: red;
+      //   color: white;
+      // }
+    }
   }
 }
 .lang-switch {

@@ -77,7 +77,7 @@ export default {
   computed: {
     state_btn_variant() {
       var _state = this.vms_data.MainState.toUpperCase();
-      if (_state == "DOWN" | _state == "ALARM" | _state == "STOP") {
+      if (_state == "DOWN" | _state == "ALARM" | _state == "STOP" | _state == "SYSTEM_INIT") {
         return 'danger'
       }
       else if (_state == "IDLE" | _state == "INITIALIZE" | _state == "CHARGING") {
