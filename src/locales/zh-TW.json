@@ -33,5 +33,7 @@
     "charging_current":"充電電流",
     "wait_online_text":"AGV正在執行上下線請求，請稍後...",
     "refresh":"重新整理",
-    "clear_alarm_records":"清除異常紀錄"
+    "clear_alarm_records":"清除異常紀錄",
+    "backend_server_error":"後端服務器連線異常",
+    "connecting":"連線中"
 }

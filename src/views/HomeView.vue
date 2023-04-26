@@ -15,7 +15,11 @@
     >{{ $i18n.locale=='zh-TW'? NewestAlarm.CN: NewestAlarm.Description }}</div>
     <div v-if="back_end_server_err" class="server-error py-1 border">
       <i class="bi bi-exclamation-diamond"></i>
-      {{ server_err_state_text }}
+      {{$t('backend_server_error')}}
+    </div>
+    <div v-if="back_end_server_connecting" class="server-connecting py-1 border">
+      <i class="bi bi-exclamation-diamond"></i>
+      {{$t('connecting')}}
     </div>
 
     <div class="d-flex flex-row h-100">
@@ -296,7 +300,8 @@ export default {
   },
   data() {
     return {
-      back_end_server_err: true,
+      back_end_server_err: false,
+      back_end_server_connecting: true,
       loading: false,
       dialogTableVisible: false,
       isInitializing: false,
@@ -383,6 +388,7 @@ export default {
       socket.onmessage = (event) => {
 
         this.back_end_server_err = false;
+        this.back_end_server_connecting = false;
         this.VMSData = JSON.parse(event.data);
 
         if (this.VMSData.Tag != this.previous_tagID && this.VMSData.Tag > 0) {
@@ -392,11 +398,13 @@ export default {
         this.BusPublishDataOut();
       };
       socket.onclose = () => {
+        this.back_end_server_connecting = false;
         this.back_end_server_err = true;
         this.server_err_state_text = "後端伺服器異常";
         this.VMSDataWebsocketInit()
       }
       socket.onerror = () => {
+        this.back_end_server_connecting = false;
         this.server_err_state_text = "後端伺服器異常";
         this.back_end_server_err = true;
       }
@@ -515,10 +523,14 @@ export default {
   font-size: 20px;
   animation: color-change 1s infinite;
 }
-.server-error {
-  animation: color-change 1s infinite;
+.server-connecting {
+  animation: server-connectingcolor-change 1s infinite;
 }
-@keyframes color-change {
+
+.server-error {
+  animation: server-errorcolor-change 1s infinite;
+}
+@keyframes server-errorcolor-change {
   0% {
     background-color: red;
     color: white;
@@ -531,11 +543,23 @@ export default {
     background-color: red;
     color: white;
   }
-  // 100% {
-  //   background-color: red;
-  //   color: white;
-  // }
 }
+
+@keyframes server-connectingcolor-change {
+  0% {
+    background-color: rgb(255, 193, 22);
+    color: white;
+  }
+  50% {
+    background-color: rgb(255, 237, 156);
+    color: black;
+  }
+  100% {
+    background-color: rgb(255, 193, 22);
+    color: white;
+  }
+}
+
 .status {
   .sys-name,
   .agvc-name,

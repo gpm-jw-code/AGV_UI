@@ -32,6 +32,9 @@
     "charging_current":"Charging Current",
     "wait_online_text":"AGV Online Process is running, Please wait...",
     "refresh":"Refresh",
-    "clear_alarm_records":"Clear"
+    "clear_alarm_records":"Clear",
+    "backend_server_error":"Server Error",
+    "connecting":"Connecting..."
+
 
 }
