@@ -153,9 +153,15 @@
               <agv_operator :agv_type="VMSData.Agv_Type" :operation_enabled="operation_enabled"></agv_operator>
             </div>
           </b-tab>
-          <b-tab v-if="false" :title="$t('3d_model')">
+          <b-tab v-if="is_god_mode_now" :title="$t('3d_model')">
             <div class="mt-3 border p-1">
               <ForkAGV3D></ForkAGV3D>
+            </div>
+          </b-tab>
+
+          <b-tab v-if="is_god_mode_now" title="AGVS MSG">
+            <div class="mt-3 border p-1">
+              <AGVSMsgDisplay ref="agvs_msg_table"></AGVSMsgDisplay>
             </div>
           </b-tab>
           <b-tab v-if="false" title="Task">
@@ -283,7 +289,6 @@ import ForkAGV3D from '@/components/3DModel/ForkAGV3DModel.vue'
 import TaskDeliveryVue from '@/components/VMSTask/TaskDelivery.vue'
 import CSTReader from '@/components/CSTReaderView.vue'
 import { Initialize, CancelInitProcess, ResetAlarm, BuzzerOff, RemoveCassette, MODESwitcher } from '@/api/VMSAPI'
-
 import bus from '@/event-bus.js'
 import VMSData from '@/ViewModels/VMSData.js'
 import UserInfo from '@/ViewModels/UserInfo.js'
@@ -292,14 +297,16 @@ import { version } from '@/gpm_param'
 import jw_switch from "@/components/UIComponents/jw-switch.vue"
 import Notifier from "@/api/NotifyHelper.js"
 import WebSocketHelp from '@/api/WebSocketHepler'
+import AGVSMsgDisplay from '@/components/AGVSMsgDisplay.vue'
 // @ is an alias to /src
 export default {
   name: 'HomeView',
   components: {
-    jw_switch, battery, mileage, emo, status_card, alarm_warn_table, agv_operator, login, connection_state, ForkAGV3D, TaskDeliveryVue, CSTReader
+    jw_switch, battery, mileage, emo, status_card, alarm_warn_table, agv_operator, login, connection_state, ForkAGV3D, TaskDeliveryVue, CSTReader, AGVSMsgDisplay
   },
   data() {
     return {
+      is_god_mode_now: false,
       back_end_server_err: false,
       back_end_server_connecting: true,
       loading: false,
@@ -379,11 +386,29 @@ export default {
         this.remove_CstData_ComfirmDialog_Show = false;
       }, 300);
     },
+    AGVSMsgIOWebsocketInit() {
+      var ws = new WebSocketHelp('ws/AGVS_MSG_IO');
+      ws.Connect();
+      var socket = ws.wssocket;
+      socket.onmessage = (event) => {
+        var msg_io_data = JSON.parse(event.data);
+        this.$refs['agvs_msg_table'].AddNewMsgData(msg_io_data);
+        if (msg_io_data.Message.includes('0301')) {
 
+          try {
+            console.info(JSON.parse(msg_io_data.Message.replaceAll("*\r", "")));
+          }
+          catch (err) {
+            console.info(err.toString());
+          }
+
+          Notifier.Primary("New Task Receieved!", "bottom", 2000);
+        }
+      };
+    },
     VMSDataWebsocketInit() {
       var ws = new WebSocketHelp('ws/AGVCState');
       ws.Connect();
-      console.info('abcv');
       var socket = ws.wssocket;
       socket.onmessage = (event) => {
 
@@ -497,13 +522,16 @@ export default {
     //   this.moduleInformation = await GetModuleInformation();
     // }, 200);
     this.VMSDataWebsocketInit();
+    this.AGVSMsgIOWebsocketInit();
     bus.on('/login_success', (user_info) => {
       this.CurrentUserinfo = user_info;
       this.Operator_role = this.CurrentUserinfo.GetRoleName()
       this.LoginBtnText = '登出'
       Notifier.Success(`${this.CurrentUserinfo.UserName}(${this.CurrentUserinfo.Role}) Login Success`);
     })
-
+    bus.on('/god_mode_changed', (is_god_mode_now) => {
+      this.is_god_mode_now = is_god_mode_now
+    });
 
     setTimeout(() => {
       this.loading = false;

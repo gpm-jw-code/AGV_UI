@@ -1,5 +1,9 @@
 <template>
-  <i @click="ToggleMenu" v-show="showMenuToggleIcon" class="bi text-light bi-list menu-toggle-icon"></i>
+  <i
+    @click="ToggleMenu"
+    v-show="showMenuToggleIcon"
+    class="bi text-primary bi-list menu-toggle-icon"
+  ></i>
   <SideMenuDrawer ref="side_menu"></SideMenuDrawer>
   <router-view v-slot="{ Component }">
     <keep-alive>

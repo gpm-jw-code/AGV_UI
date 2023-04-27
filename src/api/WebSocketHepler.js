@@ -35,7 +35,9 @@ class WebSocketHelp {
 
   SendAliveCheck() {
     this.alive_check_timer = setInterval(() => {
-      this.wssocket.send('alive')
+      try {
+        this.wssocket.send('alive')
+      } catch (error) {}
     }, 1000)
   }
 }

@@ -40,7 +40,6 @@ import { Circle as CircleStyle, Fill, Stroke, Style, Text, RegularShape, Image }
 import LineString from 'ol/geom/LineString';
 import { MapAPI } from '@/api/VMSAPI'
 import bus from '@/event-bus'
-import { my_data } from '@/gpm_param.js'
 import Notifier from '@/api/NotifyHelper';
 export default {
   name: 'MapComponent',
@@ -350,8 +349,6 @@ export default {
       source.clear(); //把原有的feature移除
     },
     UpdateNavPathRender(tags = []) {
-
-      my_data.test = Date.now();
       this.ClearNavPath();
       if (tags.length == 0) {
         return;
