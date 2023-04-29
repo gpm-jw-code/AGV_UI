@@ -39,19 +39,6 @@
       UI Version:Beta
       <p>1.0.1</p>
     </div>
-    <b-modal
-      :key="modal_key"
-      class="admin-dialog-modal"
-      v-model="modalShow"
-      title="Administartor"
-      :centered="true"
-      :no-close-on-backdrop="true"
-      @ok="AdminSwitchDialogResultHandle(true)"
-      @cancel="AdminSwitchDialogResultHandle(false)"
-      @hidden=" version_text_click_count = 0;modalShow=false"
-    >
-      <p>Do You Known What Are You Doing?</p>
-    </b-modal>
   </div>
 </template>
 
@@ -65,6 +52,8 @@ import clsDIOTable from '@/ViewModels/clsDIOTable';
 import ManualSettings from './ManualSettings.vue';
 import WebSocketHelp from '@/api/WebSocketHepler'
 import bus from '@/event-bus.js'
+import { ElMessage, ElMessageBox } from 'element-plus'
+
 export default {
 
   components: {
@@ -76,7 +65,6 @@ export default {
       DIOTableData: new clsDIOTable(),
       trigger_admin_dialog_count: 5,
       version_text_click_count: 0,
-      modalShow: false,
       isGodMode: false,
       modal_key: ''
     }
@@ -101,16 +89,35 @@ export default {
     VersionTextClickHandle() {
       this.version_text_click_count += 1;
       if (this.version_text_click_count > this.trigger_admin_dialog_count) {
-        this.modalShow = true;
+        this.ConfirmGODTriggering();
       }
+    },
+    ConfirmGODTriggering() {
+
+      ElMessageBox.confirm(
+        'Do you known what are you doing now?',
+        'Warning',
+        {
+          confirmButtonText: 'YES',
+          cancelButtonText: 'Cancel',
+          type: 'warning',
+          draggable: true,
+          closeOnClickModal: false
+        }
+      )
+        .then(() => {
+          this.AdminSwitchDialogResultHandle(true);
+        })
+        .catch(() => {
+          this.AdminSwitchDialogResultHandle(false);
+        })
+
     },
     AdminSwitchDialogResultHandle(checked = false) {
       this.version_text_click_count = 0;
       this.isGodMode = checked;
       bus.emit('/god_mode_changed', checked);
-      setTimeout(() => {
-        this.modalShow = false;
-      }, 100);
+
     }
   },
   props: {

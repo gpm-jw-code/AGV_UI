@@ -1,7 +1,59 @@
 <template>
   <div class="status-card">
     <h4 class="text-start">{{$t('Status_info')}}</h4>
+
     <div class="w-100 border p-3">
+      <div class="module-error" v-show="false">
+        <el-alert
+          class="my-1"
+          show-icon
+          title="光達模組異常"
+          type="error"
+          effect="dark"
+          :closable="false"
+        />
+        <el-alert
+          class="my-1"
+          show-icon
+          title="磁導引模組異常"
+          type="error"
+          effect="dark"
+          :closable="false"
+        />
+        <el-alert
+          class="my-1"
+          show-icon
+          title="走行馬達異常"
+          type="error"
+          effect="dark"
+          :closable="false"
+        />
+        <el-alert
+          class="my-1"
+          show-icon
+          title="電池模組異常"
+          type="error"
+          effect="dark"
+          :closable="false"
+        />
+        <el-alert
+          class="my-1"
+          show-icon
+          title="IO模組異常"
+          type="error"
+          effect="dark"
+          :closable="false"
+        />
+        <el-alert
+          class="my-1"
+          show-icon
+          title="Barcode Reader模組異常"
+          type="error"
+          effect="dark"
+          :closable="false"
+        />
+        <el-divider></el-divider>
+      </div>
       <table class="status-tb w-100">
         <tbody>
           <tr align="justify">

@@ -298,6 +298,8 @@ import jw_switch from "@/components/UIComponents/jw-switch.vue"
 import Notifier from "@/api/NotifyHelper.js"
 import WebSocketHelp from '@/api/WebSocketHepler'
 import AGVSMsgDisplay from '@/components/AGVSMsgDisplay.vue'
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
+
 // @ is an alias to /src
 export default {
   name: 'HomeView',
@@ -332,7 +334,9 @@ export default {
       },
       currentTabs: 0,
       previous_tagID: -99,
-      ws: null
+      ws: null,
+      previousAGVPoseIsError: false,
+      ShowAGVPoseErrorModel: false
     }
   },
   methods: {
@@ -392,18 +396,21 @@ export default {
       var socket = ws.wssocket;
       socket.onmessage = (event) => {
         var msg_io_data = JSON.parse(event.data);
-        this.$refs['agvs_msg_table'].AddNewMsgData(msg_io_data);
-        if (msg_io_data.Message.includes('0301')) {
+        if (this.$refs['agvs_msg_table'] != undefined) {
+          this.$refs['agvs_msg_table'].AddNewMsgData(msg_io_data);
+          if (msg_io_data.Message.includes('0301')) {
 
-          try {
-            console.info(JSON.parse(msg_io_data.Message.replaceAll("*\r", "")));
-          }
-          catch (err) {
-            console.info(err.toString());
-          }
+            try {
+              console.info(JSON.parse(msg_io_data.Message.replaceAll("*\r", "")));
+            }
+            catch (err) {
+              console.info(err.toString());
+            }
 
-          Notifier.Primary("New Task Receieved!", "bottom", 2000);
+            Notifier.Primary("New Task Receieved!", "bottom", 2000);
+          }
         }
+
       };
     },
     VMSDataWebsocketInit() {
@@ -420,6 +427,7 @@ export default {
           Notifier.Primary(`Tag Detected:${this.VMSData.Tag}`, 'bottom', 1500);
         }
         this.previous_tagID = this.VMSData.Tag;
+        this.AGVPoseErrorHandler();
         this.BusPublishDataOut();
       };
       socket.onclose = () => {
@@ -434,6 +442,20 @@ export default {
         this.back_end_server_err = true;
       }
       this.ws = ws;
+    },
+    AGVPoseErrorHandler() {
+      if (this.VMSData.IsAGVPoseError != this.previousAGVPoseIsError) {
+        //this.ShowAGVPoseErrorModel = this.VMSData.IsAGVPoseError;
+        if (this.VMSData.IsAGVPoseError) {
+          ElNotification({
+            title: 'POSE ERROR',
+            message: 'TAG讀取角度異常:與導航角度不同',
+            type: 'error',
+            duration: 0
+          })
+        }
+        this.previousAGVPoseIsError = this.VMSData.IsAGVPoseError;
+      }
     },
     BusPublishDataOut() {
       bus.emit('/vms_data', this.VMSData);

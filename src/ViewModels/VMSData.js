@@ -43,6 +43,7 @@ class VMSData {
   DriversStates = new Array() < clsDriverState > 0
   Laser_Mode = 0
   UltrSensorState = new UltrasonicSensorState()
+  IsAGVPoseError = false
 }
 
 export class UltrasonicSensorState {
