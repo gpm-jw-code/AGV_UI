@@ -1,12 +1,11 @@
 <template>
   <el-dialog v-model="dialogVisible" :show-close="false" width="600">
     <template #header="{titleId, login_title }">
-      <div class="login-header">
+      <div class="login-header border-bottom my-2">
         <h3 :id="titleId" :class="login_title">Login</h3>
-        <el-divider></el-divider>
       </div>
     </template>
-    <div class="login-content">
+    <div class="login-content py-2">
       <el-form label-position="top">
         <el-form-item label="Account" :required="true">
           <el-input
@@ -39,14 +38,18 @@
         </el-form-item>
       </el-form>
       <div class="login-message">{{ message}}</div>
+      <div class="text-end px-3">
+        <span class="dialog-footer">
+          <el-button :loading="logining" type="primary" @click="LoginHandle()">Login</el-button>
+          <el-button type="info" @click="dialogVisible = false">Cancel</el-button>
+        </span>
+      </div>
+      <div class="keyboard py-2">
+        <KeyBoard @onChange="onChange" :input="keyboard_input"></KeyBoard>
+      </div>
     </div>
-    <KeyBoard @onChange="onChange" :input="keyboard_input"></KeyBoard>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button :loading="logining" type="primary" @click="LoginHandle()">Login</el-button>
-        <el-button type="info" @click="dialogVisible = false">Cancel</el-button>
-      </span>
-    </template>
+
+    <template #footer></template>
   </el-dialog>
 </template>
 
@@ -136,6 +139,7 @@ export default {
     text-align: left;
   }
 }
+
 .login-content {
   position: relative;
   top: -50px;
@@ -147,5 +151,9 @@ export default {
     color: red;
     text-align: left;
   }
+}
+.keyboard {
+  position: relative;
+  top: 0px;
 }
 </style>

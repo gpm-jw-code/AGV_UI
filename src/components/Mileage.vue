@@ -1,7 +1,7 @@
 <template>
   <div class="mileage">
     <div>{{mileage}} km</div>
-    <div>{{ time }}</div>
+    <!-- <div>{{ time }}</div> -->
   </div>
 </template>
 

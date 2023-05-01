@@ -24,6 +24,7 @@
         header
         border
         height="550"
+        size="small"
       >
         <el-table-column label="Time" prop="Time" width="160" :formatter="TimeFormmter"></el-table-column>
         <el-table-column label="Code" prop="Code" width="90" header-align="center">

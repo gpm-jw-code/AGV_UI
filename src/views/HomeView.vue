@@ -118,18 +118,19 @@
           </div>
         </div>
         <div class="connection-status border m-2 p-3 py-1">
-          <h5>{{$t('connection-states') }}</h5>
+          <div class="state-title">{{$t('connection-states') }}</div>
           <connection_state></connection_state>
         </div>
 
         <div class="battery border m-2 my-0 p-3 py-1">
-          <h5>{{$t('battery-level')}}</h5>
+          <div class="state-title py-1">{{$t('battery-level')}}</div>
           <battery></battery>
         </div>
         <div class="mileage border m-2 p-3 py-1">
-          <h5>{{$t('mileage')}}</h5>
+          <div class="state-title">{{$t('mileage')}}</div>
           <mileage></mileage>
         </div>
+        <div>{{ time }}</div>
         <div>
           <emo :disabled="back_end_server_err"></emo>
         </div>
@@ -299,6 +300,7 @@ import Notifier from "@/api/NotifyHelper.js"
 import WebSocketHelp from '@/api/WebSocketHepler'
 import AGVSMsgDisplay from '@/components/AGVSMsgDisplay.vue'
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
+import moment from 'moment'
 
 // @ is an alias to /src
 export default {
@@ -308,6 +310,7 @@ export default {
   },
   data() {
     return {
+      time: '2022/12/12 19:00:09',
       is_god_mode_now: false,
       back_end_server_err: false,
       back_end_server_connecting: true,
@@ -554,7 +557,9 @@ export default {
     bus.on('/god_mode_changed', (is_god_mode_now) => {
       this.is_god_mode_now = is_god_mode_now
     });
-
+    setInterval(() => {
+      this.time = moment(Date.now()).format('yyyy/MM/DD HH:mm:ss');
+    }, 1000);
     setTimeout(() => {
       this.loading = false;
     }, 3000);
@@ -618,7 +623,7 @@ export default {
     margin: auto 1px;
     color: white;
     font-weight: bold;
-    font-size: 27px;
+    font-size: 22px;
     // letter-spacing: 2px;
   }
 
@@ -651,8 +656,9 @@ export default {
 }
 .side {
   width: 250px;
-  h5 {
+  .state-title {
     font-weight: bold;
+    font-size: 14px;
   }
   .opt-buttons {
     font-weight: bold;
@@ -697,8 +703,8 @@ export default {
   width: 100px;
   height: 50px;
   position: absolute;
-  right: 13px;
-  top: 75px;
+  right: 0px;
+  top: 40px;
   padding: 2px;
   align-items: center;
 }
