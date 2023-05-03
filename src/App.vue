@@ -30,6 +30,9 @@ export default {
     }
   },
   mounted() {
+
+    document.title = "GPM AGV";
+
     bus.on('/god_mode_changed', (is_god_mode_now) => {
       this.showMenuToggleIcon = is_god_mode_now
     });
