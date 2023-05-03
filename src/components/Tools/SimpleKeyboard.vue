@@ -15,16 +15,38 @@ export default {
     },
     input: {
       type: String
+    },
+    keyboard_type: {
+      type: String,
+      default() {
+        return ""
+      }
     }
   },
   data: () => ({
     keyboard: null
   }),
   mounted() {
-    this.keyboard = new Keyboard(this.keyboardClass, {
-      onChange: this.onChange,
-      onKeyPress: this.onKeyPress
-    });
+
+    if (this.keyboard_type == 'number') {
+
+      this.keyboard = new Keyboard(this.keyboardClass, {
+        onChange: this.onChange,
+        onKeyPress: this.onKeyPress,
+        layout: {
+          default: ["1 2 3", "4 5 6", "7 8 9", " 0 {bksp}", ""],
+        },
+        theme: "hg-theme-default hg-layout-numeric numeric-theme"
+
+      });
+    } else {
+
+      this.keyboard = new Keyboard(this.keyboardClass, {
+        onChange: this.onChange,
+        onKeyPress: this.onKeyPress,
+
+      });
+    }
   },
   methods: {
     onChange(input) {
