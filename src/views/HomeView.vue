@@ -123,7 +123,10 @@
         </div>
 
         <div class="battery border m-2 my-0 p-3 py-1">
-          <div class="state-title py-1">{{$t('battery-level')}}</div>
+          <div class="state-title py-1">
+            {{$t('battery-level')}}
+            <el-tag v-show="VMSData.BatteryStatus.IsError" type="warning" effect="dark">異常</el-tag>
+          </div>
           <battery></battery>
         </div>
         <div class="mileage border m-2 p-3 py-1">
@@ -160,12 +163,12 @@
             </div>
           </b-tab>
 
-          <b-tab v-if="is_god_mode_now" title="AGVS MSG">
+          <b-tab title="AGVS MSG">
             <div class="mt-3 border p-1">
               <AGVSMsgDisplay ref="agvs_msg_table"></AGVSMsgDisplay>
             </div>
           </b-tab>
-          <b-tab v-if="false" title="Task">
+          <b-tab v-if="true" title="Task">
             <div class="mt-3 border p-1">
               <TaskDeliveryVue></TaskDeliveryVue>
             </div>
@@ -401,17 +404,17 @@ export default {
         var msg_io_data = JSON.parse(event.data);
         if (this.$refs['agvs_msg_table'] != undefined) {
           this.$refs['agvs_msg_table'].AddNewMsgData(msg_io_data);
-          if (msg_io_data.Message.includes('0301')) {
 
-            try {
-              console.info(JSON.parse(msg_io_data.Message.replaceAll("*\r", "")));
-            }
-            catch (err) {
-              console.info(err.toString());
-            }
-
-            Notifier.Primary("New Task Receieved!", "bottom", 2000);
-          }
+        }
+        if (msg_io_data.Message.includes('0301')) {
+          var task_msg = JSON.parse(msg_io_data.Message.replaceAll("*\r", ""))
+          var task_name = task_msg["Header"]["0301"]["Task Name"];
+          ElNotification({
+            title: 'NAVITATOR_NEW_TASK',
+            message: task_name,
+            type: 'success',
+            duration: 10000
+          })
         }
 
       };
@@ -631,7 +634,7 @@ export default {
     margin-left: 0;
   }
   .agvc-name {
-    background-color: rgb(108, 117, 125);
+    background-color: rgb(0, 197, 211);
   }
   .account-name {
     background-color: rgb(23, 162, 184);
