@@ -4,7 +4,16 @@
       <div class="item-label">Laser Mode</div>
       <div>
         <b-input-group>
-          <b-form-input :disabled="!enabled" v-model="laser_mode" type="number" min="0"></b-form-input>
+          <b-form-input
+            size="lg"
+            class="centered-text"
+            :disabled="!enabled"
+            v-model="laser_mode"
+            type="number"
+            min="0"
+            max="16"
+            text-align="center"
+          ></b-form-input>
           <div class="updown-btns">
             <b-input-group-append>
               <b-button :disabled="!enabled" squared @click="LaserMode_Increase">▲</b-button>
@@ -20,10 +29,11 @@
         :disabled="!enabled"
         squared
         class="mx-1"
-        variant="danger"
+        variant="primary"
+        style="font-size:24px;font-weight: bold;"
       >Modify</b-button>
     </div>
-
+    <SimpleKeyboard v-show="enabled" keyboard_type="number" @onChange="onChange"></SimpleKeyboard>
     <b-modal
       v-model="modifyLaserModeDialogShow"
       :centered="true"
@@ -39,7 +49,11 @@
 <script>
 import { LaserMode } from '@/api/VMSAPI.js'
 import Notifier from '@/api/NotifyHelper';
+import SimpleKeyboard from '@/components/Tools/SimpleKeyboard.vue'
 export default {
+  components: {
+    SimpleKeyboard,
+  },
   props: {
     enabled: {
       type: Boolean,
@@ -49,7 +63,7 @@ export default {
   data() {
     return {
       laser_mode: 0,
-      modifyLaserModeDialogShow: false
+      modifyLaserModeDialogShow: false,
 
     }
   },
@@ -65,6 +79,16 @@ export default {
     async ModifyLaserMode() {
       await LaserMode(this.laser_mode);
       Notifier.Success(`Lasr mode changed:${this.laser_mode}`);
+    },
+    onChange(input) {
+      if (input + "" == "") {
+        this.laser_mode = 0;
+      } else {
+        if (input > 16) {
+          input = 16
+        }
+        this.laser_mode = input;
+      }
     }
   },
 }
@@ -72,21 +96,25 @@ export default {
 
 <style lang="scss" scoped>
 .manual_settings {
-  height: 400px;
+  height: 450px;
   .item-label {
-    width: 130px;
-    font-size: 20px;
+    width: 160px;
+    font-size: 26px;
     text-align: left;
     padding: 5px;
   }
+  .b-form-input input {
+    text-align: center;
+  }
   .updown-btns {
     button {
-      height: 22px;
+      height: 25px;
       font-size: small;
       text-align: center;
       padding: 0px;
       width: 43px;
-      border: 1px solid black;
+      border: 1px solid rgb(255, 255, 255);
+      background-color: rgb(0, 123, 255);
     }
   }
 }
