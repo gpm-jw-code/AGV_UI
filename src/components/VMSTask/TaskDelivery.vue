@@ -42,7 +42,7 @@
         >派送任務</b-button>
       </div>
     </div>
-    <MapShowVue ref="map"></MapShowVue>
+    <MapShowVue style="height:600px" ref="map"></MapShowVue>
     <b-modal
       @ok="TaskDeliveryHandle"
       v-model="confirm_dialog_show"
@@ -190,6 +190,7 @@ export default {
 <style scoped lang="scss">
 .task-delivery {
   padding: 10px;
+  height: auto;
   .item {
     display: flex;
     flex-direction: row;
