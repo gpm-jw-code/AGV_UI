@@ -12,27 +12,41 @@
           <el-option label="充電" value="charge"></el-option>
         </el-select>
       </div>
-      <div class="item">
-        <div class="title">{{ From_Lable_display }}</div>
-        <el-select v-model="selectedTag" placeholder="請選擇tag_id">
-          <el-option v-for="tag in tags" :key="tag.id" :label="tag.name" :value="tag.id"></el-option>
-        </el-select>
-      </div>
-      <div class="item" v-if="selectedAction === 'carry'">
-        <div class="title">To</div>
-        <el-select v-model="selectedToTag" placeholder="請選擇to_tag">
-          <el-option v-for="tag in tags" :key="tag.id" :label="tag.name" :value="tag.id"></el-option>
-        </el-select>
-      </div>
+
+      <!-- For Move -->
       <div
-        class="item"
-        v-if="selectedAction === 'carry'|selectedAction === 'load'|selectedAction === 'unload'"
+        v-if="selectedAction === 'move'|selectedAction === 'unload'|selectedAction === 'load'|selectedAction === 'charge'|selectedAction === 'park'"
       >
-        <div class="title">Cassttle ID</div>
-        <el-select v-model="selectedCst" placeholder="請選擇cst_id">
-          <el-option v-for="cst in csts" :key="cst.id" :label="cst.name" :value="cst.id"></el-option>
-        </el-select>
+        <div class="item">
+          <div class="title">目的地</div>
+          <el-select
+            @click="GetNormalStationTagsFromMap()"
+            v-model="selectedToTag"
+            placeholder="請選擇目的地"
+          >
+            <el-option v-for="tag in tags" :key="tag.id" :label="tag.name" :value="tag.id"></el-option>
+          </el-select>
+        </div>
       </div>
+      <div v-else>
+        <div class="item">
+          <div class="title">FROM</div>
+          <el-select v-model="selectedTag" placeholder="請選擇目的地">
+            <el-option v-for="tag in tags" :key="tag.id" :label="tag.name" :value="tag.id"></el-option>
+          </el-select>
+        </div>
+        <div class="item">
+          <div class="title">To</div>
+          <el-select v-model="selectedToTag" placeholder="請選擇to_tag">
+            <el-option v-for="tag in tags" :key="tag.id" :label="tag.name" :value="tag.id"></el-option>
+          </el-select>
+        </div>
+        <div class="item">
+          <div class="title">Cassttle ID</div>
+          <el-input v-model="selectedCst"></el-input>
+        </div>
+      </div>
+
       <div class="text-start">
         <b-button
           @click="TaskDeliveryBtnClickHandle"
@@ -134,11 +148,7 @@ export default {
   },
   methods: {
     TaskDeliveryBtnClickHandle() {
-      if (this.selectedTag == '' | this.selectedTag == undefined) {
-        this.notify_text = '尚未選擇目的地';
-        this.notify_dialog_show = true;
-        return;
-      }
+
       if (this.selectedAction == 'carry' && (this.selectedToTag == '' | this.selectedToTag == undefined)) {
         this.notify_text = '尚未選擇目的地';
         this.notify_dialog_show = true;
@@ -163,6 +173,30 @@ export default {
       }
       else
         Notifier.Danger(`任務派送失敗:${response.error_message}`, "bottom", 5000);
+
+    },
+    GetNormalStationTagsFromMap() {
+      var normal_stations = this.$refs['map'].GetNormalStations();
+      console.info(normal_stations);
+
+      function compare(a, b) {
+        if (a.TagNumber < b.TagNumber) {
+          return -1;
+        }
+        if (a.TagNumber > b.TagNumber) {
+          return 1;
+        }
+        return 0;
+      }
+      normal_stations.sort(compare);
+      this.moveable_tags = [];
+      normal_stations.forEach(station => {
+
+        this.moveable_tags.push({
+          id: station.TagNumber,
+          name: '(Normal)' + station.TagNumber
+        });
+      })
 
     }
   },
