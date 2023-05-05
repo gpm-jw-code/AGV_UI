@@ -34,7 +34,14 @@
     "refresh":"Refresh",
     "clear_alarm_records":"Clear",
     "backend_server_error":"Server Error",
-    "connecting":"Connecting..."
+    "connecting":"Connecting...",
+    "agv-online":"AGV ON/OFFLine Switch",
+    "agv-online-alert":"AGV ONLINE?",
+    "agv-offline-alert":"AGV OFFLINE?",
+    "agv-auto-mode":"AGV Auto/Manual Switch",
+    "agv-auto-mode-alert":"AGV Auto Mode?",
+    "agv-manual-mode-alert":"AGV Manual Mode?",
+    "clear-alarm-data-confirm-text":"Clear Alarm History Data?"
 
 
 }

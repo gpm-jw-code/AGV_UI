@@ -4,6 +4,7 @@
     "reset_alarm":"異常排除",
     "buzzer_off":"蜂鳴器關閉",
     "cst-remove":"移除卡匣",
+    "cst-remove-confirm-text":"確定要移除卡匣資料?",
     "login":"登入",
     "connection-states":"連線狀態",
     "battery-level":"電量",
@@ -30,10 +31,18 @@
     "stop":"停止",
     "cancel_init_action_notify":"確定要取消初始化動作?",
     "start_init_action_notify":"確定要進行初始化動作? 初始化動作開始後 Fork 將會下降,請確認 Fork上有無貨物，並確認 AGV 周圍無障礙物",
+    "start_init_action_notify_submarin_agv":"確定要進行初始化動作?",
     "charging_current":"充電電流",
     "wait_online_text":"AGV正在執行上下線請求，請稍後...",
     "refresh":"重新整理",
     "clear_alarm_records":"清除異常紀錄",
     "backend_server_error":"後端服務器連線異常",
-    "connecting":"連線中"
+    "connecting":"連線中",
+    "agv-online":"AGV上/下線確認",
+    "agv-online-alert":"確定要將AGV ONLINE?",
+    "agv-offline-alert":"確定要將AGV OFFLINE?",
+    "agv-auto-mode":"AGV 手動/自動模式切換確認",
+    "agv-auto-mode-alert":"確定要將AGV 切換為自動模式?",
+    "agv-manual-mode-alert":"確定要將AGV 切換為手動模式?",
+    "clear-alarm-data-confirm-text":"確定要清除異常紀錄?"
 }

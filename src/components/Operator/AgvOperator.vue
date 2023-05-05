@@ -93,24 +93,16 @@ export default {
       }
     },
     ConfirmGODTriggering() {
-
-      ElMessageBox.confirm(
-        'Do you known what are you doing now?',
-        'Warning',
-        {
-          confirmButtonText: 'YES',
-          cancelButtonText: 'Cancel',
-          type: 'warning',
-          draggable: true,
-          closeOnClickModal: false
-        }
-      )
-        .then(() => {
-          this.AdminSwitchDialogResultHandle(true);
-        })
-        .catch(() => {
-          this.AdminSwitchDialogResultHandle(false);
-        })
+      this.$swal.fire({
+        title: 'Warning',
+        text: `Do you known what are you doing now?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        allowOutsideClick: false
+      }).then((result) => {
+        this.AdminSwitchDialogResultHandle(result.isConfirmed);
+      })
 
     },
     AdminSwitchDialogResultHandle(checked = false) {

@@ -1,0 +1,21 @@
+
+
+.swal2-html-container {
+    font-size: 2.223rem;
+    font-weight: bold;
+}
+
+.swal2-popup{
+    width: 45rem;
+    .swal2-title{
+        font-size: 1.8rem;
+        font-weight: normal;
+
+    }
+}
+
+.swal2-popup .swal2-confirm,
+.swal2-popup .swal2-cancel {
+  padding: 0.35rem 1.25rem;
+  font-size: 2.5rem;
+}

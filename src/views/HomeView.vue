@@ -35,16 +35,6 @@
           >
             <b>{{$t('initialize') }}</b>
           </b-button>
-          <!-- <b-button
-            :disabled="back_end_server_err||VMSData.IsSystemIniting"
-            @click="AGVInitialize()"
-            :variant="initBtnVariant"
-            class="mb-1 p-2"
-            block
-          >
-            <b>{{$t('initialize') }}</b>
-          </b-button>-->
-
           <b-button
             :disabled="back_end_server_err"
             @click="AGVResetAlarm()"
@@ -65,7 +55,7 @@
           </b-button>
           <b-button
             :disabled="back_end_server_err"
-            @click="remove_CstData_ComfirmDialog_Show=true"
+            @click="ShowRemoveCstDialog()"
             variant="outline-dark"
             class="mb-1 p-2"
             block
@@ -230,18 +220,7 @@
       >
         <p ref="online-fail-msg"></p>
       </b-modal>
-      <!--模式切換確認對話框 -->
-      <b-modal
-        v-model="mode_switch_comfirmDialog"
-        :noCloseOnBackdrop="true"
-        :centered="true"
-        title="Mode Switch Confrim"
-        @ok="ModeSwitchHandler"
-        header-bg-variant="primary"
-        header-text-variant="light"
-      >
-        <p>確定要將模式切換為{{ModeSwitchDisplay}}?</p>
-      </b-modal>
+
       <!--取消初始化對話框 -->
       <b-modal
         v-model="cancelInitComfirmDialogShow"
@@ -264,17 +243,6 @@
         @ok="InitializeWorker"
       >
         <p>{{$t('start_init_action_notify')}}</p>
-      </b-modal>
-      <!--確認移除卡匣在席資料對話框-->
-      <b-modal
-        v-model="remove_CstData_ComfirmDialog_Show"
-        :centered="true"
-        @ok="AGVRemoveCassette()"
-        title="CST Remove Confirm"
-        header-bg-variant="primary"
-        header-text-variant="light"
-      >
-        <p>確定要移除卡匣資料?</p>
       </b-modal>
     </div>
   </div>
@@ -324,7 +292,6 @@ export default {
       StartInitComfirmDialogShow: false,
       IsUseChinese: true,
       wait_online_request_dialog_show: false,
-      mode_switch_comfirmDialog: false,
       remove_CstData_ComfirmDialog_Show: false,
       ShowOnlineFailDialog: false,
       moduleInformation: {},
@@ -369,8 +336,38 @@ export default {
         this.cancelInitComfirmDialogShow = true;
       }
       else {
-        this.StartInitComfirmDialogShow = true;
+        // this.StartInitComfirmDialogShow = true;
+        /**測試 */
+        this.$swal.fire({
+          title: 'AGV Initialize',
+          text: `${this.$t('start_init_action_notify_submarin_agv')}`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'OK',
+          customClass: 'my-sweetalert'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.InitializeWorker();
+          }
+        })
+
+        /***************************************** */
       }
+    },
+    ShowRemoveCstDialog() {
+      this.$swal.fire({
+        title: `${this.$t('cst-remove')}`,
+        text: `${this.$t('cst-remove-confirm-text')}`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        customClass: 'my-sweetalert'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.AGVRemoveCassette();
+        }
+      })
+
     },
     async InitializeWorker() {
       this.isInitializing = true;
@@ -475,16 +472,44 @@ export default {
     AutoModeSwitchHandle() {
       this.mode_switch_data.type = 'auto'
       this.mode_switch_data.state = !this.IsAutoMode;
-      this.mode_switch_comfirmDialog = true;
+
+      this.$swal.fire({
+        title: `${this.$t('agv-auto-mode')}`,
+        text: `${this.mode_switch_data.state ? this.$t('agv-auto-mode-alert') : this.$t('agv-manual-mode-alert')}`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        customClass: 'my-sweetalert'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.ModeSwitchHandler();
+        }
+      })
+
+
     },
     OnlineModeSwitchHandle() {
       if (!this.IsOnlineMode && this.VMSData.MainState.toUpperCase() != 'IDLE' && this.VMSData.MainState.toUpperCase() != 'CHARGING') {
         Notifier.Danger(`當前狀態無法上線(${this.VMSData.MainState})`, "top", 5000);
         return;
       }
+
       this.mode_switch_data.type = 'online'
       this.mode_switch_data.state = !this.IsOnlineMode;
-      this.mode_switch_comfirmDialog = true;
+
+      this.$swal.fire({
+        title: `${this.$t('agv-online')}`,
+        text: `${this.mode_switch_data.state ? this.$t('agv-online-alert') : this.$t('agv-offline-alert')}`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        customClass: 'my-sweetalert'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.ModeSwitchHandler();
+        }
+      })
+
 
     },
     async ModeSwitchHandler() {
@@ -503,9 +528,6 @@ export default {
           this.wait_online_request_dialog_show = false;
         }, 1000);
       }
-      setTimeout(() => {
-        this.mode_switch_comfirmDialog = false;
-      }, 300);
     },
   },
   computed: {

@@ -6,7 +6,7 @@
         <b-button
           v-if="clear_alarm_btn_visible"
           variant="danger"
-          @click="clear_alarms_dialog_show=true"
+          @click="ClearAlarmAlert()"
           size="sm"
         >{{ $t('clear_alarm_records') }}</b-button>
       </div>
@@ -113,6 +113,21 @@ export default {
       this.totalAlarmNum = await AlarmTableAPI.TotalAlarmCount()
       this.alarms = await AlarmTableAPI.QueryByPage(this.page, this.page_size);
       this.table_loading = false;
+    },
+    ClearAlarmAlert() {
+      this.$swal.fire({
+        title: 'Alert Clear',
+        text: `${this.$t('clear-alarm-data-confirm-text')}`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        customClass: 'my-sweetalert'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.ClearAlarmRecords();
+        }
+      })
+
     },
     async ClearAlarmRecords() {
       await AlarmTableAPI.ClearAlarms();
