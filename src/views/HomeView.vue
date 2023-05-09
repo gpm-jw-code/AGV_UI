@@ -5,7 +5,7 @@
         <div>GPM AGV</div>
         <!-- <div v-if="VMSData.Simulation" class="simulation-mode p-1 mx-2">SIMULATION</div> -->
       </div>
-      <div class="agvc-name flex-fill">{{VMSData.CarName}}</div>
+      <div class="agvc-name flex-fill" @click="where_r_u()">{{VMSData.CarName}}</div>
       <div class="account-name flex-fill">{{Operator_role }}</div>
       <div class="version-name flex-fill">{{ App_version }}</div>
     </div>
@@ -260,7 +260,7 @@ import connection_state from '@/components/ConnectionStates.vue'
 import ForkAGV3D from '@/components/3DModel/ForkAGV3DModel.vue'
 import TaskDeliveryVue from '@/components/VMSTask/TaskDelivery.vue'
 import CSTReader from '@/components/CSTReaderView.vue'
-import { Initialize, CancelInitProcess, ResetAlarm, BuzzerOff, RemoveCassette, MODESwitcher } from '@/api/VMSAPI'
+import { Initialize, CancelInitProcess, ResetAlarm, BuzzerOff, RemoveCassette, MODESwitcher, Where_r_u } from '@/api/VMSAPI'
 import bus from '@/event-bus.js'
 import VMSData from '@/ViewModels/VMSData.js'
 import UserInfo from '@/ViewModels/UserInfo.js'
@@ -313,6 +313,9 @@ export default {
     }
   },
   methods: {
+    async where_r_u() {
+      await Where_r_u();
+    },
     LangChangeHandle(checked) {
       this.IsUseChinese = checked;
       this.$i18n.locale = this.IsUseChinese ? 'zh-TW' : 'en-US';
@@ -425,9 +428,27 @@ export default {
         this.back_end_server_err = false;
         this.back_end_server_connecting = false;
         this.VMSData = JSON.parse(event.data);
+        // class info{
+        //     AGV_Name
+        //     Current_Tag
+        //     State
+        //     IsOnline
+        //     Rotation
+        // }
+        //agv_data: info[] 
+        if (this.VMSData.Tag > 0) {
+          bus.emit('/agv_name_list', [{
+            AGV_Name: this.VMSData.CarName,
+            Current_Tag: this.VMSData.Tag,
+            State: this.VMSData.MainState,
+            IsOnline: this.VMSData.OnlineMode == 1,
+            Rotation: 0
+          }])
+          if (this.VMSData.Tag != this.previous_tagID) {
+            Notifier.Primary(`Tag Detected:${this.VMSData.Tag}`, 'bottom', 1500);
+            this.ShowMaxSpeedLimitNotification(this.VMSData.Tag, this.VMSData.NavInfo.Speed_max_limit);
 
-        if (this.VMSData.Tag != this.previous_tagID && this.VMSData.Tag > 0) {
-          Notifier.Primary(`Tag Detected:${this.VMSData.Tag}`, 'bottom', 1500);
+          }
         }
         this.previous_tagID = this.VMSData.Tag;
         this.AGVPoseErrorHandler();
@@ -445,6 +466,16 @@ export default {
         this.back_end_server_err = true;
       }
       this.ws = ws;
+    },
+    ShowMaxSpeedLimitNotification(tag, speed_limit) {
+      if (speed_limit == -1)
+        return;
+      ElNotification({
+        title: '限速',
+        message: `Tag[${tag}] AGV 速度限制 : ${speed_limit} `,
+        type: 'warning',
+        duration: 3000
+      })
     },
     AGVPoseErrorHandler() {
       if (this.VMSData.IsAGVPoseError != this.previousAGVPoseIsError) {

@@ -74,7 +74,7 @@
             </td>
             <td>{{$t('target_position')}}</td>
             <td class="val-column">
-              <b-form-input size="sm" disabled v-model="currentPosition"></b-form-input>
+              <b-form-input size="sm" disabled v-model="vms_data.NavInfo.Destination"></b-form-input>
               <!-- <el-input disabled v-model="currentPosition"></el-input> -->
             </td>
           </tr>
@@ -107,6 +107,12 @@
               <b-form-input size="sm" disabled v-model="vms_data.AGV_Direct"></b-form-input>
             </td>
           </tr>
+          <tr v-if="true" align="justify">
+            <td>Laser Mode</td>
+            <td>
+              <b-form-input size="sm" disabled v-model="vms_data.Current_LASER_MODE"></b-form-input>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -132,13 +138,13 @@ export default {
       if (_state == "DOWN" | _state == "ALARM" | _state == "STOP" | _state == "SYSTEM_INIT") {
         return 'danger'
       }
-      else if (_state == "IDLE" | _state == "INITIALIZE" | _state == "CHARGING") {
+      else if (_state == "INITIALIZE" | _state == "CHARGING") {
         return 'primary'
       }
       else if (_state == "RUN" | _state == "WORKING") {
         return "success";
       }
-      else if (_state == "WARNING") {
+      else if (_state == "IDLE" | _state == "WARNING") {
         return 'warning'
       }
       return ""

@@ -34,6 +34,10 @@ class VMSData {
     yValue: 0.0,
     theta: 0.0,
   }
+  NavInfo = {
+    Destination: '',
+    Speed_max_limit: -1,
+  }
   MapComparsionRate = -1
   AlarmCodes = []
   NewestAlarm = undefined
@@ -44,6 +48,7 @@ class VMSData {
   Laser_Mode = 0
   UltrSensorState = new UltrasonicSensorState()
   IsAGVPoseError = false
+  Current_LASER_MODE = 'Bypass'
 }
 
 export class UltrasonicSensorState {

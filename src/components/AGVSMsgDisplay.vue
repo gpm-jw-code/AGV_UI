@@ -36,7 +36,7 @@ export default {
     AddNewMsgData(data) {
       var ary = []
       if (this.only_task_msg) {
-        if (!data.Message.includes('0301')) {
+        if (!data.Message.includes('0301') && !data.Message.includes('0305')) {
           return;
         }
         var task_msg = JSON.parse(data.Message.replaceAll("*\r", ""))
@@ -46,14 +46,14 @@ export default {
         this.MsgDataList.pop();
       }
       data.TimeFormated = moment(data.Time).format('yyyy-MM-DD HH:mm:ss')
-      data.Direction_str = data.Direction == 0 ? 'AGVS->VMS' : 'VMS->AGVS'
+      data.Direction_str = data.Direction == 0 ? 'AGVS->AGV' : 'AGV->AGVS'
       // data.Msg_Display = data.Message.substring(0, 150) + '...';
       data.Msg_Display = data.Message;
       this.MsgDataList.unshift(data);
     }
     ,
     GetTagType(Direction_str) {
-      return Direction_str == "AGVS->VMS" ? 'danger' : 'primary';
+      return Direction_str == "AGVS->AGV" ? 'danger' : 'primary';
     }
   },
 }

@@ -9,6 +9,11 @@ export async function EMO() {
   return ret
 }
 
+export async function Where_r_u() {
+  var ret = await axios_entity.get('api/VMS/Where_r_u')
+  return ret.data
+}
+
 export async function Initialize() {
   var ret = await axios_entity.post('api/VMS/Initialize')
   return ret.data

@@ -261,7 +261,6 @@ export default {
       //     IsOnline
       //     Rotation
       // }
-
       //agv_data: info[] 
       bus.on('/agv_name_list', (agv_data) => {
         this.UpdateAGVLayer(agv_data);
@@ -634,6 +633,7 @@ export default {
             state: agv_state,
             heighlight: false
           }
+          console.info(agv_prop_exist);
           this.agvList.push(agv_prop_exist)
         }
         var agv_position = this.get_agv_position(agv_name);
