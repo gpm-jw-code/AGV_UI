@@ -4,8 +4,8 @@
       <tbody>
         <tr>
           <td>
-            <div class="connected">
-              <i :class="'bi bi-circle-fill'"></i> UI Server
+            <div>
+              <i :class="'connected bi bi-circle-fill'"></i> UI Server
             </div>
           </td>
           <td>
