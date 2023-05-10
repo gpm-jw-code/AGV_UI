@@ -34,6 +34,38 @@
       >Modify</b-button>
     </div>
     <SimpleKeyboard v-show="enabled" keyboard_type="number" @onChange="onChange"></SimpleKeyboard>
+
+    <div class="d-flex flex-row py-3">
+      <div class="item-label">煞車功能</div>
+      <b-button
+        :disabled="!enabled"
+        class="mx-1"
+        squared
+        variant="danger"
+        style="width:130px"
+        @click="Brake()"
+      >煞車</b-button>
+      <b-button
+        :disabled="!enabled"
+        class="mx-1"
+        squared
+        variant="primary"
+        style="width:130px"
+        @click="UnBrake()"
+      >解除煞車</b-button>
+    </div>
+
+    <div class="d-flex flex-row py-3">
+      <div class="item-label">里程數</div>
+      <b-button
+        :disabled="!enabled"
+        class="mx-1"
+        squared
+        variant="danger"
+        style="width:130px"
+        @click="ResetMile()"
+      >重置里程數</b-button>
+    </div>
     <b-modal
       v-model="modifyLaserModeDialogShow"
       :centered="true"
@@ -47,7 +79,7 @@
 </template>
 
 <script>
-import { LaserMode } from '@/api/VMSAPI.js'
+import { LaserMode, Braker, Reset_Mileage } from '@/api/VMSAPI.js'
 import Notifier from '@/api/NotifyHelper';
 import SimpleKeyboard from '@/components/Tools/SimpleKeyboard.vue'
 export default {
@@ -80,6 +112,16 @@ export default {
       await LaserMode(this.laser_mode);
       Notifier.Success(`Lasr mode changed:${this.laser_mode}`);
     },
+    async Brake() {
+      await Braker.Brake();
+    },
+    async UnBrake() {
+      await Braker.UnBrake();
+
+    },
+    async ResetMile() {
+      await Reset_Mileage();
+    },
     onChange(input) {
       if (input + "" == "") {
         this.laser_mode = 0;
@@ -99,7 +141,7 @@ export default {
   height: 450px;
   .item-label {
     width: 160px;
-    font-size: 26px;
+    font-size: 24px;
     text-align: left;
     padding: 5px;
   }

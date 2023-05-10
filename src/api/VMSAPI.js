@@ -99,6 +99,11 @@ export async function GetMileage() {
   return ret.data
 }
 
+/**Reset_Mileage */
+export async function Reset_Mileage(mode = 0) {
+  var ret = await axios_entity.get(`api/VMS/Reset_Mileage`)
+  return ret.data
+}
 /**Laser Mode */
 export async function LaserMode(mode = 0) {
   var ret = await axios_entity.get(`api/VMS/LaserMode?mode=${mode}`)
@@ -117,6 +122,18 @@ export const DIO = {
     var ret = await axios_entity.get(
       `api/VMS/DIO/DI_State?address=${address}&state=${state}`,
     )
+    return ret.data
+  },
+}
+
+/**煞車模組 */
+export const Braker = {
+  async Brake() {
+    var ret = await axios_entity.get(`api/VMS/Brake`)
+    return ret.data
+  },
+  async UnBrake() {
+    var ret = await axios_entity.get(`api/VMS/UnBrake`)
     return ret.data
   },
 }

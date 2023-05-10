@@ -63,8 +63,12 @@
                 <b>{{vms_data.MainState }}</b>
               </b-button>
             </td>
-            <td>CIM {{$t('status')}}</td>
-            <td class="val-column">4</td>
+            <td>Laser Mode</td>
+            <td>
+              <b-form-input size="sm" disabled v-model="vms_data.Current_LASER_MODE"></b-form-input>
+            </td>
+            <!-- <td>CIM {{$t('status')}}</td>
+            <td class="val-column">4</td>-->
           </tr>
           <tr align="justify">
             <td>{{$t('current_position')}}</td>
@@ -105,12 +109,6 @@
             <td>AGV Direct</td>
             <td>
               <b-form-input size="sm" disabled v-model="vms_data.AGV_Direct"></b-form-input>
-            </td>
-          </tr>
-          <tr v-if="true" align="justify">
-            <td>Laser Mode</td>
-            <td>
-              <b-form-input size="sm" disabled v-model="vms_data.Current_LASER_MODE"></b-form-input>
             </td>
           </tr>
         </tbody>
