@@ -1,15 +1,22 @@
 <template>
   <div class="home h-100" v-loading="loading">
     <!-- Top Header  -->
-    <div class="status d-flex flex-row">
-      <div class="sys-name bg-success flex-fill d-flex flex-row justify-content-center">
-        <div>GPM AGV</div>
-        <!-- <div v-if="VMSData.Simulation" class="simulation-mode p-1 mx-2">SIMULATION</div> -->
+    <div>
+      <div class="status d-flex flex-row">
+        <div class="sys-name bg-success flex-fill d-flex flex-row justify-content-center">
+          <div>GPM AGV</div>
+          <!-- <div v-if="VMSData.Simulation" class="simulation-mode p-1 mx-2">SIMULATION</div> -->
+        </div>
+        <div class="agvc-name flex-fill" @click="where_r_u()">{{VMSData.CarName}}</div>
+        <div class="account-name flex-fill">{{Operator_role }}</div>
+        <div class="version-name flex-fill">{{ App_version }}</div>
       </div>
-      <div class="agvc-name flex-fill" @click="where_r_u()">{{VMSData.CarName}}</div>
-      <div class="account-name flex-fill">{{Operator_role }}</div>
-      <div class="version-name flex-fill">{{ App_version }}</div>
+      <div
+        v-bind:class="VMSData.LightsStates.Front?'light-on-front':'light-off-front'"
+        class="w-100"
+      ></div>
     </div>
+
     <!-- Alarm and Notifies -->
     <div
       v-if="NewestAlarm!=undefined"
@@ -26,7 +33,7 @@
     <!--  -->
 
     <div class="d-flex flex-row h-100">
-      <div v-show="false" class="h-100 light-indicator">left-light</div>
+      <div v-bind:class="VMSData.LightsStates.Left?'light-on':'light-off'" class="h-100"></div>
       <!--Side 左側邊-->
       <div class="side h-100">
         <div class="opt-buttons px-1 py-1 d-flex flex-column">
@@ -196,8 +203,10 @@
           ></el-switch>-->
         </div>
       </div>
-      <div v-show="false" class="h-100 light-indicator">right-light</div>
+      <div v-bind:class="VMSData.LightsStates.Right?'light-on':'light-off'" class="h-100"></div>
     </div>
+    <div v-bind:class="VMSData.LightsStates.Back?'light-on-back':'light-off-front'" class="w-100"></div>
+
     <!--對話框們-->
     <div class="modals">
       <!--等待上線動作完成對話框 -->
@@ -760,10 +769,33 @@ export default {
   }
 }
 
-.light-indicator {
-  width: 10px;
-  background-color: lime;
+.light-on,
+.light-off {
+  width: 5px;
 }
+.light-on {
+  background-color: rgb(104, 173, 253);
+}
+
+.light-off.light-off-front {
+  background-color: white;
+}
+.light-on-back {
+  position: fixed;
+  bottom: 0;
+}
+.light-on-front,
+.light-on-back {
+  background-color: rgb(255, 61, 61);
+  animation: server-errorcolor-change 1s infinite;
+}
+
+.light-on-front,
+.light-off-front,
+.light-on-back {
+  height: 5px;
+}
+
 .lang-switch {
   // background-color: red;
   width: 100px;

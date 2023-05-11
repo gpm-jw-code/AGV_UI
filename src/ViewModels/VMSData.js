@@ -49,6 +49,16 @@ class VMSData {
   UltrSensorState = new UltrasonicSensorState()
   IsAGVPoseError = false
   Current_LASER_MODE = 'Bypass'
+  LightsStates = {
+    Front: false,
+    Back: false,
+    Right: false,
+    Left: false,
+    Run: false,
+    Down: false,
+    Idle: false,
+    Online: false,
+  }
 }
 
 export class UltrasonicSensorState {
