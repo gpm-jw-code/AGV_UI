@@ -126,6 +126,14 @@
         <div class="battery border m-2 my-0 p-3 py-1">
           <div class="state-title py-1">
             {{$t('battery-level')}}
+            <img
+              v-if="VMSData.BatteryStatus.CircuitOpened"
+              class="circular_img mx-1"
+              src="@/assets/connect.png"
+              alt
+              height="16"
+            />
+            <img v-else class="circular_img mx-1" height="16" src="@/assets/disconnect.png" alt />
             <el-tag v-show="VMSData.BatteryStatus.IsError" type="warning" effect="dark">異常</el-tag>
           </div>
           <battery></battery>
