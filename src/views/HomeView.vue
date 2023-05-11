@@ -1,5 +1,6 @@
 <template>
   <div class="home h-100" v-loading="loading">
+    <!-- Top Header  -->
     <div class="status d-flex flex-row">
       <div class="sys-name bg-success flex-fill d-flex flex-row justify-content-center">
         <div>GPM AGV</div>
@@ -9,6 +10,7 @@
       <div class="account-name flex-fill">{{Operator_role }}</div>
       <div class="version-name flex-fill">{{ App_version }}</div>
     </div>
+    <!-- Alarm and Notifies -->
     <div
       v-if="NewestAlarm!=undefined"
       :class="NewestAlarm.Level=='Alarm'?'alarm-show p-1 bg-danger':'alarm-show p-1 bg-warning'"
@@ -21,8 +23,10 @@
       <i class="bi bi-exclamation-diamond"></i>
       {{$t('connecting')}}
     </div>
+    <!--  -->
 
     <div class="d-flex flex-row h-100">
+      <div v-show="false" class="h-100 light-indicator">left-light</div>
       <!--Side 左側邊-->
       <div class="side h-100">
         <div class="opt-buttons px-1 py-1 d-flex flex-column">
@@ -192,6 +196,7 @@
           ></el-switch>-->
         </div>
       </div>
+      <div v-show="false" class="h-100 light-indicator">right-light</div>
     </div>
     <!--對話框們-->
     <div class="modals">
@@ -753,6 +758,11 @@ export default {
       // }
     }
   }
+}
+
+.light-indicator {
+  width: 10px;
+  background-color: lime;
 }
 .lang-switch {
   // background-color: red;
