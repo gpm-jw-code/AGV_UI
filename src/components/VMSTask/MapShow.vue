@@ -266,6 +266,7 @@ export default {
         this.UpdateAGVLayer(agv_data);
       });
       bus.on('/nav_path_update', (dto) => {
+        console.info('/nav_path_update', dto);
         this.UpdateNavPathRender(dto.name, dto.tags)
       })
 
@@ -304,6 +305,7 @@ export default {
       return this.map.getLayers().item(this.layer_index.station_line);
     },
     AGV_Layer() {
+      console.info('AGV_Layer');
       return this.map.getLayers().item(this.layer_index.agv);
     },
     Nav_Path_Layer() {
@@ -583,18 +585,21 @@ export default {
     },
     UpdateAGVLayer(agv_data) {
 
-      var output = this.CreateAGVFeatures(agv_data);
-      var agv_layer_source = this.AGV_Layer.getSource()
-      agv_layer_source.clear();
-      agv_layer_source.addFeatures(output.agv_features);
-      agv_layer_source.changed();
+      try {
+        var output = this.CreateAGVFeatures(agv_data);
 
-      var agv_nav_path_layer_source = this.Nav_Path_Layer.getSource()
-      agv_nav_path_layer_source.clear();
-      agv_nav_path_layer_source.addFeatures(output.agv_nav_path_features);
-      agv_nav_path_layer_source.changed();
+        var agv_layer_source = this.AGV_Layer.getSource()
+        agv_layer_source.clear();
+        agv_layer_source.addFeatures(output.agv_features);
+        agv_layer_source.changed();
 
+        var agv_nav_path_layer_source = this.Nav_Path_Layer.getSource()
+        agv_nav_path_layer_source.clear();
+        agv_nav_path_layer_source.addFeatures(output.agv_nav_path_features);
+        agv_nav_path_layer_source.changed();
+      } catch {
 
+      }
     },
     GetAgvProp(agv_name) {
       return this.agvList.find(av => av.name == agv_name);
@@ -645,7 +650,7 @@ export default {
         agv_features.push(agv_feature);
 
         var agvIcon = new Icon({
-          src: '/agv.png', // 设置PNG图像的路径
+          src: '/station.png', // 设置PNG图像的路径
           scale: .5, // 设置PNG图像的缩放比例
           anchor: [0.5, 0.5], // 设置PNG图像的锚点，即图片的中心点位置
           size: [70, 70],// 设置PNG图像的大小
@@ -658,10 +663,10 @@ export default {
           text: new Text({
             text: agv_name + `\r\n(${agv_state})`,
             offsetX: 10,
-            offsetY: 30,
+            offsetY: 38,
             font: 'bold 18px Arial',
             fill: new Fill({
-              color: isOnline ? agv_prop_exist.color : 'rgb(192, 192, 192)'
+              color: isOnline ? agv_prop_exist.color : 'red'
             }),
             stroke: new Stroke({
               color: agv_prop_exist.heighlight ? 'red' : 'black',
@@ -863,12 +868,16 @@ export default {
       });
       this.map.addLayer(path_vectorLayer)
       let source = path_vectorLayer.getSource();
-      var color = this.agvList.find(agv => agv.name == agv_name).color;
-      if (color) {
-        var features = this.CreateLineFeaturesOfPath(tags, color);
+
+      var _agv = this.agvList.find(agv => agv.name == agv_name);
+      if (_agv) {
+        var color = _agv.color;
+        if (color) {
+          var features = this.CreateLineFeaturesOfPath(tags, color);
+        }
+        source.addFeatures(features)
+        source.changed();
       }
-      source.addFeatures(features)
-      source.changed();
     },
     UpdatePathPlanRender(tags = []) {
 

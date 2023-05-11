@@ -1,5 +1,5 @@
 const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
   transpileDependencies: true,
-  outputDir: '../AGVVMS/wwwroot',
+  outputDir: '../AGV_VMS/wwwroot',
 })
