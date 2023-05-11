@@ -484,8 +484,8 @@ export default {
           ElNotification({
             title: 'POSE ERROR',
             message: 'TAG讀取角度異常:與導航角度不同',
-            type: 'error',
-            duration: 0
+            type: 'warning',
+            duration: 3000
           })
         }
         this.previousAGVPoseIsError = this.VMSData.IsAGVPoseError;
