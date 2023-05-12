@@ -35,7 +35,7 @@
     </div>
     <SimpleKeyboard v-show="enabled" keyboard_type="number" @onChange="onChange"></SimpleKeyboard>
 
-    <div class="d-flex flex-row py-3">
+    <div v-if="false" class="d-flex flex-row py-3">
       <div class="item-label">煞車功能</div>
       <b-button
         :disabled="!enabled"
@@ -55,7 +55,7 @@
       >解除煞車</b-button>
     </div>
 
-    <div class="d-flex flex-row py-3">
+    <div v-if="false" class="d-flex flex-row py-3">
       <div class="item-label">里程數</div>
       <b-button
         :disabled="!enabled"

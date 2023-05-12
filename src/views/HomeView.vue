@@ -169,7 +169,7 @@
               <AGVSMsgDisplay ref="agvs_msg_table"></AGVSMsgDisplay>
             </div>
           </b-tab>
-          <b-tab v-if="true" title="Task">
+          <b-tab v-if="is_god_mode_now" title="Task">
             <div class="mt-3 border p-1">
               <TaskDeliveryVue></TaskDeliveryVue>
             </div>
