@@ -126,6 +126,14 @@
         <div class="battery border m-2 my-0 p-3 py-1">
           <div class="state-title py-1">
             {{$t('battery-level')}}
+            <img
+              v-if="VMSData.BatteryStatus.CircuitOpened"
+              class="circular_img mx-1"
+              src="@/assets/connect.png"
+              alt
+              height="16"
+            />
+            <img v-else class="circular_img mx-1" height="16" src="@/assets/disconnect.png" alt />
             <el-tag v-show="VMSData.BatteryStatus.IsError" type="warning" effect="dark">異常</el-tag>
           </div>
           <battery></battery>
@@ -140,69 +148,8 @@
         </div>
       </div>
       <!--主要內容 TabControl-->
-      <div class="flex-fill border p-3">
-        <b-tabs pills @activate-tab="TabChangedHandler">
-          <b-tab :title="$t('status')" active>
-            <div class="mt-3 border p-1">
-              <status_card :ModuleInformation="moduleInformation"></status_card>
-            </div>
-          </b-tab>
-          <!--Alarm Table-->
-          <b-tab :title="$t('abnormal-record')">
-            <div class="mt-3 border p-1">
-              <alarm_warn_table></alarm_warn_table>
-            </div>
-          </b-tab>
-          <b-tab :title="$t('operation')">
-            <div class="mt-3 border p-1">
-              <agv_operator :agv_type="VMSData.Agv_Type" :operation_enabled="operation_enabled"></agv_operator>
-            </div>
-          </b-tab>
-          <b-tab v-if="is_god_mode_now" :title="$t('3d_model')">
-            <div class="mt-3 border p-1">
-              <ForkAGV3D></ForkAGV3D>
-            </div>
-          </b-tab>
 
-          <b-tab title="AGVS MSG">
-            <div class="mt-3 border p-1">
-              <AGVSMsgDisplay ref="agvs_msg_table"></AGVSMsgDisplay>
-            </div>
-          </b-tab>
-          <b-tab v-if="is_god_mode_now" title="Task">
-            <div class="mt-3 border p-1">
-              <TaskDeliveryVue></TaskDeliveryVue>
-            </div>
-          </b-tab>
-
-          <b-tab v-if="false" title="CST READER">
-            <div class="mt-3 border p-1">
-              <CSTReader></CSTReader>
-            </div>
-          </b-tab>
-        </b-tabs>
-        <!--語系切換按鈕-->
-        <div class="lang-switch">
-          <jw_switch
-            @switch="LangChangeHandle"
-            :default="IsUseChinese"
-            active_text="CH"
-            active_color="rgb(13, 110, 253)"
-            inactive_text="EN"
-            inactive_color="rgb(8, 135, 150)"
-          ></jw_switch>
-          <!-- <el-switch
-            @change="LangChangeHandle"
-            v-model="IsUseChinese"
-            size="large"
-            active-text="CH"
-            inactive-text="EN"
-            active-color="rgb(40, 167, 69)"
-            inline-prompt
-            width="70"
-          ></el-switch>-->
-        </div>
-      </div>
+      <MainContent :VMSData="VMSData"></MainContent>
       <div v-bind:class="VMSData.LightsStates.Right?'light-on':'light-off'" class="h-100"></div>
     </div>
     <div v-bind:class="VMSData.LightsStates.Back?'light-on-back':'light-off-front'" class="w-100"></div>
@@ -266,32 +213,24 @@
 import battery from '@/components/Battery.vue'
 import mileage from '@/components/Mileage.vue'
 import emo from '@/components/EMOButton.vue'
-import status_card from "@/components/StatusInfoCard.vue"
-import alarm_warn_table from '@/components/AlarmWarningTable.vue'
-import agv_operator from '@/components/Operator/AgvOperator.vue'
 import login from '@/components/Login.vue'
 import connection_state from '@/components/ConnectionStates.vue'
-import ForkAGV3D from '@/components/3DModel/ForkAGV3DModel.vue'
-import TaskDeliveryVue from '@/components/VMSTask/TaskDelivery.vue'
-import CSTReader from '@/components/CSTReaderView.vue'
 import { Initialize, CancelInitProcess, ResetAlarm, BuzzerOff, RemoveCassette, MODESwitcher, Where_r_u } from '@/api/VMSAPI'
 import bus from '@/event-bus.js'
 import VMSData from '@/ViewModels/VMSData.js'
 import UserInfo from '@/ViewModels/UserInfo.js'
-import param from '@/gpm_param'
 import { version } from '@/gpm_param'
 import jw_switch from "@/components/UIComponents/jw-switch.vue"
 import Notifier from "@/api/NotifyHelper.js"
 import WebSocketHelp from '@/api/WebSocketHepler'
-import AGVSMsgDisplay from '@/components/AGVSMsgDisplay.vue'
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import moment from 'moment'
-
+import MainContent from '@/components/MainContent/TabContainer.vue'
 // @ is an alias to /src
 export default {
   name: 'HomeView',
   components: {
-    jw_switch, battery, mileage, emo, status_card, alarm_warn_table, agv_operator, login, connection_state, ForkAGV3D, TaskDeliveryVue, CSTReader, AGVSMsgDisplay
+    jw_switch, battery, mileage, emo, login, connection_state, MainContent
   },
   data() {
     return {
@@ -304,7 +243,6 @@ export default {
       isInitializing: false,
       cancelInitComfirmDialogShow: false,
       StartInitComfirmDialogShow: false,
-      IsUseChinese: true,
       wait_online_request_dialog_show: false,
       remove_CstData_ComfirmDialog_Show: false,
       ShowOnlineFailDialog: false,
@@ -329,21 +267,6 @@ export default {
   methods: {
     async where_r_u() {
       await Where_r_u();
-    },
-    LangChangeHandle(checked) {
-      this.IsUseChinese = checked;
-      this.$i18n.locale = this.IsUseChinese ? 'zh-TW' : 'en-US';
-      bus.emit('/lang_changed', this.$i18n.locale);
-      if (this.IsUseChinese) {
-        Notifier.Success("語言變更:中文", 'bottom', 800);
-      } else {
-        Notifier.Primary("Language:English", 'bottom', 800);
-      }
-    },
-    TabChangedHandler(currentTabs, previousTabs) {
-      this.currentTabs = currentTabs;
-      if (currentTabs == 1)
-        bus.emit('/alarmtable_tab_click')
     },
     ShowLogin() {
       this.$refs.login.Show();
@@ -794,16 +717,5 @@ export default {
 .light-off-front,
 .light-on-back {
   height: 5px;
-}
-
-.lang-switch {
-  // background-color: red;
-  width: 100px;
-  height: 50px;
-  position: absolute;
-  right: 0px;
-  top: 40px;
-  padding: 2px;
-  align-items: center;
 }
 </style>
