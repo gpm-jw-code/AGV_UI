@@ -59,11 +59,11 @@
     <div v-if="speed_modifyable" class="w-100 bg-light text-start px-2 py-3">
       <div class="speed-item-container d-flex flex-row">
         <div>Linear Speed</div>
-        <el-input-number v-model="linear_speed" :step="0.01" :max="0.2" :min="0.01"></el-input-number>
+        <el-input-number v-model="linear_speed" :step="0.01" :max="0.3" :min="0.01"></el-input-number>
       </div>
       <div class="speed-item-container d-flex flex-row">
         <div>Rotation Speed</div>
-        <el-input-number v-model="rotation_speed" :step="0.01" :max="0.2" :min="0.01"></el-input-number>
+        <el-input-number v-model="rotation_speed" :step="0.01" :max="0.3" :min="0.01"></el-input-number>
       </div>
     </div>
   </div>
