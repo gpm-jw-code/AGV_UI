@@ -18,8 +18,8 @@
         row-key="address_display"
         @row-dblclick="cellDoubleClickHandle"
       >
-        <el-table-column label="Addr" prop="address_display" width="60"></el-table-column>
-        <el-table-column label="Name" prop="name"></el-table-column>
+        <el-table-column label="Addr" prop="Address" width="60"></el-table-column>
+        <el-table-column label="Name" prop="Name"></el-table-column>
         <el-table-column label="Value" prop="State" width="60" :formatter="StateFormatter"></el-table-column>
         <!-- <el-table-column width="40" v-if="!readonly && enabled" label>
           <template #default="scope">
@@ -135,7 +135,7 @@ export default {
         await DIO.DI_State_Change(row.address_display, !row.State)
       } else {
         this.DIOChangeComfirmDialogShow = true;
-        this.toChangeAddress = row.address_display;
+        this.toChangeAddress = row.Address;
         this.toChangeState = !row.State;
 
       }

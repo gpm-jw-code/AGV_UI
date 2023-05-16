@@ -16,11 +16,11 @@ class clsDIOTable {
 export class clsRegister {
   constructor(address_display, name) {
     this.address_display = address_display
-    this.name = name
+    this.Name = name
   }
-  address = 0
+  Address = 0
   address_display = ''
-  name = ''
+  Name = ''
   State = false
   DigitalType = 0
 }

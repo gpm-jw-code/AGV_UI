@@ -60,7 +60,7 @@
             <td>{{$t('status')}}</td>
             <td class="val-column">
               <b-button class="w-100" :variant="state_btn_variant">
-                <b>{{vms_data.MainState }}</b>
+                <b>{{vms_data.SubState }}</b>
               </b-button>
             </td>
             <td>Laser Mode</td>
@@ -132,7 +132,7 @@ export default {
   },
   computed: {
     state_btn_variant() {
-      var _state = this.vms_data.MainState.toUpperCase();
+      var _state = this.vms_data.SubState.toUpperCase();
       if (_state == "DOWN" | _state == "ALARM" | _state == "STOP" | _state == "SYSTEM_INIT") {
         return 'danger'
       }

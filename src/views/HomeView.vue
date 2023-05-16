@@ -41,7 +41,7 @@
             :disabled="back_end_server_err||VMSData.IsSystemIniting"
             @click="AGVInitialize()"
             class="mb-1 p-2"
-            v-bind:class="VMSData.MainState.toLowerCase()"
+            v-bind:class="VMSData.SubState.toLowerCase()"
             block
           >
             <b>{{$t('initialize') }}</b>

@@ -4,6 +4,7 @@ class VMSData {
   Agv_Type = 0
   Simulation = false
   MainState = 'DOWN'
+  SubState = 'DOWN'
   IsInitialized = false
   IsSystemIniting = false
   OnlineMode = 0
