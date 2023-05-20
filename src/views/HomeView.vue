@@ -381,10 +381,14 @@ export default {
             IsOnline: this.VMSData.OnlineMode == 1,
             Rotation: 0
           }])
+
           if (this.VMSData.Tag != this.previous_tagID) {
             Notifier.Primary(`Tag Detected:${this.VMSData.Tag}`, 'bottom', 1500);
             this.ShowMaxSpeedLimitNotification(this.VMSData.Tag, this.VMSData.NavInfo.Speed_max_limit);
-
+            bus.emit('/nav_path_update', {
+              name: this.VMSData.CarName,
+              tags: this.VMSData.NavInfo.PathPlan
+            })
           }
         }
         this.previous_tagID = this.VMSData.Tag;
@@ -660,7 +664,8 @@ export default {
     .down {
       background-color: rgb(220, 53, 69);
     }
-    .initialize {
+    .initialize,
+    .initializing {
       animation: initializing-color-change 1s infinite;
     }
     .idle,

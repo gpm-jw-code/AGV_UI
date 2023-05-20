@@ -132,7 +132,7 @@ export default {
     },
     async cellDoubleClickHandle(row, column, event) {
       if (this.digital_type == 'input') {
-        await DIO.DI_State_Change(row.address_display, !row.State)
+        await DIO.DI_State_Change(row.Address, !row.State)
       } else {
         this.DIOChangeComfirmDialogShow = true;
         this.toChangeAddress = row.Address;

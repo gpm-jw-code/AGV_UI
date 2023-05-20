@@ -39,6 +39,7 @@ class VMSData {
   NavInfo = {
     Destination: '',
     Speed_max_limit: -1,
+    PathPlan:[]
   }
   MapComparsionRate = -1
   AlarmCodes = []

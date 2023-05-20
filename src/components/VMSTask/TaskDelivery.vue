@@ -167,12 +167,21 @@ export default {
       console.info(response);
       if (response.accpet) {
         Notifier.Success("任務已派送");
-        var tags = response.path.map(v => v.Tag);
+        var tags = response.path.map(v => v.Point_ID);
         console.info(tags);
-        this.$refs.map.UpdateNavPathRender(tags);
+        this.$refs.map.UpdateNavPathRender(response.agv_name, tags);
       }
-      else
-        Notifier.Danger(`任務派送失敗:${response.error_message}`, "bottom", 5000);
+      else {
+        this.$swal.fire({
+          title: '任務派送失敗',
+          text: `${response.error_message}`,
+          icon: 'error',
+          showCancelButton: false,
+          confirmButtonText: 'OK',
+          customClass: 'my-sweetalert'
+        })
+      }
+      //Notifier.Danger(`任務派送失敗:${response.error_message}`, "bottom", 5000);
 
     },
     GetNormalStationTagsFromMap() {

@@ -59,7 +59,7 @@
           <tr align="justify">
             <td>{{$t('status')}}</td>
             <td class="val-column">
-              <b-button class="w-100" :variant="state_btn_variant">
+              <b-button class="w-100 border" :variant="state_btn_variant">
                 <b>{{vms_data.SubState }}</b>
               </b-button>
             </td>

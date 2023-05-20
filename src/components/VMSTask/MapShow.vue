@@ -264,6 +264,7 @@ export default {
       //agv_data: info[] 
       bus.on('/agv_name_list', (agv_data) => {
         this.UpdateAGVLayer(agv_data);
+
       });
       bus.on('/nav_path_update', (dto) => {
         console.info('/nav_path_update', dto);
@@ -666,7 +667,8 @@ export default {
             offsetY: 38,
             font: 'bold 18px Arial',
             fill: new Fill({
-              color: isOnline ? agv_prop_exist.color : 'red'
+              color: agv_state=='DOWN' ?'red':agv_state=='RUN' ? 'Lime' : 'Orange',
+
             }),
             stroke: new Stroke({
               color: agv_prop_exist.heighlight ? 'red' : 'black',
@@ -875,6 +877,7 @@ export default {
         if (color) {
           var features = this.CreateLineFeaturesOfPath(tags, color);
         }
+        _agv.PathPlan = tags;
         source.addFeatures(features)
         source.changed();
       }
