@@ -28,6 +28,7 @@ class VMSData {
       w: 0,
     },
   }
+  Angle=-1
   BCR_State_MoveBase = {
     state: 0,
     tagID: 0,

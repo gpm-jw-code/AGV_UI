@@ -9,14 +9,14 @@
           </el-form-item>
           <div class="row">
             <el-form-item class="col-6" label="X">
-              <b-form-input size="sm" disabled v-model.number="vms_data.BCR_State_MoveBase.xValue"></b-form-input>
+              <b-form-input size="sm" disabled v-model.number="vms_data.Pose.position.x"></b-form-input>
             </el-form-item>
             <el-form-item class="col-6" label="Y">
-              <b-form-input size="sm" disabled v-model.number="vms_data.BCR_State_MoveBase.yValue"></b-form-input>
+              <b-form-input size="sm" disabled v-model.number="vms_data.Pose.position.y"></b-form-input>
             </el-form-item>
           </div>
           <el-form-item label="Angles">
-            <b-form-input size="sm" disabled v-model.number="vms_data.BCR_State_MoveBase.theta"></b-form-input>
+            <b-form-input size="sm" disabled v-model.number="vms_data.Angle"></b-form-input>
           </el-form-item>
 
           <div class="row">

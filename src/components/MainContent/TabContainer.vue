@@ -4,7 +4,7 @@
     <b-tabs pills @activate-tab="TabChangedHandler">
       <b-tab :title="$t('status')" active>
         <div class="mt-3 border p-1">
-          <status_card :ModuleInformation="moduleInformation"></status_card>
+          <status_card></status_card>
         </div>
       </b-tab>
       <!--Alarm Table-->
@@ -15,7 +15,7 @@
       </b-tab>
       <b-tab :title="$t('operation')">
         <div class="mt-3 border p-1">
-          <agv_operator :agv_type="VMSData.Agv_Type" :operation_enabled="operation_enabled"></agv_operator>
+          <agv_operator :agv_type="VMSData.Agv_Type"></agv_operator>
         </div>
       </b-tab>
       <b-tab v-if="is_god_mode_now" :title="$t('3d_model')">

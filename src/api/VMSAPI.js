@@ -158,7 +158,7 @@ export const NavigationAPI = {
   async Action(action, from, to = '', cst_id = '') {
     console.info(action, from, to, cst_id)
     var ret = await axios_entity.get(
-      `api/NavigateTask/Action?action=${action}&from=${from}&to=${to}&cst_id=${cst_id}`,
+      `api/LocalNav/Action?action=${action}&from=${from}&to=${to}&cst_id=${cst_id}`,
     )
     return ret.data
   },
