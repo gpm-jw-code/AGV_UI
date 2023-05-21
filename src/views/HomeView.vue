@@ -3,7 +3,7 @@
     <!-- Top Header  -->
     <div>
       <div class="status d-flex flex-row">
-        <div class="sys-name bg-success flex-fill d-flex flex-row justify-content-center">
+        <div class="sys-name flex-fill d-flex flex-row justify-content-center">
           <div>GPM AGV</div>
         </div>
 
@@ -638,7 +638,8 @@ export default {
   .account-name {
     background-color: rgb(23, 162, 184);
   }
-  .version-name {
+  .version-name,
+  .sys-name {
     background-color: rgb(0, 123, 255);
     margin-right: 0;
   }

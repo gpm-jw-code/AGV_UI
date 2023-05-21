@@ -1,6 +1,6 @@
 <template>
   <div class="map-show border py-2 px-2 d-flex flex-row bg-light">
-    <div class="text-start m-3 py-3" style="width:117px">
+    <div v-show="false" class="text-start m-3 py-3" style="width:117px">
       <span>顯示方式</span>
       <b-form-group
         @change="NameDisplayChangeHandle"
@@ -667,7 +667,7 @@ export default {
             offsetY: 38,
             font: 'bold 18px Arial',
             fill: new Fill({
-              color: agv_state=='DOWN' ?'red':agv_state=='RUN' ? 'Lime' : 'Orange',
+              color: agv_state == 'DOWN' ? 'red' : agv_state == 'RUN' ? 'Lime' : 'Orange',
 
             }),
             stroke: new Stroke({

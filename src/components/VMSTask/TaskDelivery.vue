@@ -1,62 +1,66 @@
 <template>
   <div class="task-delivery">
-    <div class="my-2">
-      <div class="item">
-        <div class="title">Action</div>
-        <el-select v-model="selectedAction" placeholder="請選擇Action">
-          <el-option label="移動" value="None"></el-option>
-          <el-option label="停車" value="Park"></el-option>
-          <el-option label="搬運" value="Carry"></el-option>
-          <el-option label="Load" value="Load"></el-option>
-          <el-option label="Unload" value="Unload"></el-option>
-          <el-option label="充電" value="Charge"></el-option>
-        </el-select>
-      </div>
+    <div class="my-1 d-flex">
+      <div>
+        <div class="item">
+          <div class="title">動作</div>
+          <el-select v-model="selectedAction" placeholder="請選擇Action">
+            <el-option label="移動" value="None"></el-option>
+            <el-option label="停車" value="Park"></el-option>
+            <el-option label="搬運" value="Carry"></el-option>
+            <el-option label="Load" value="Load"></el-option>
+            <el-option label="Unload" value="Unload"></el-option>
+            <el-option label="充電" value="Charge"></el-option>
+          </el-select>
+          <div class="text-start mx-1">
+            <b-button
+              @click="TaskDeliveryBtnClickHandle"
+              style="width:103px"
+              variant="primary"
+              block
+            >派送任務</b-button>
+          </div>
+        </div>
 
-      <!-- For Movable -->
-      <div
-        v-if="selectedAction === 'None'|selectedAction === 'Unload'|selectedAction === 'Load'|selectedAction === 'Charge'|selectedAction === 'Park'"
-      >
-        <div class="item">
-          <div class="title">目的地</div>
-          <el-select
-            @click="GetNormalStationTagsFromMap()"
-            v-model="selectedToTag"
-            placeholder="請選擇目的地"
-          >
-            <el-option v-for="tag in tags" :key="tag.id" :label="tag.name" :value="tag.id"></el-option>
-          </el-select>
+        <!-- For Movable -->
+        <div
+          v-if="selectedAction === 'None'|selectedAction === 'Unload'|selectedAction === 'Load'|selectedAction === 'Charge'|selectedAction === 'Park'"
+        >
+          <div class="item">
+            <div class="title">目的地</div>
+            <el-select
+              @click="GetNormalStationTagsFromMap()"
+              v-model="selectedToTag"
+              placeholder="請選擇目的地"
+            >
+              <el-option v-for="tag in tags" :key="tag.id" :label="tag.name" :value="tag.id"></el-option>
+            </el-select>
+          </div>
         </div>
-      </div>
-      <div v-else>
-        <div class="item">
-          <div class="title">FROM</div>
-          <el-select v-model="selectedTag" placeholder="請選擇目的地">
-            <el-option v-for="tag in tags" :key="tag.id" :label="tag.name" :value="tag.id"></el-option>
-          </el-select>
-        </div>
-        <div class="item">
-          <div class="title">To</div>
-          <el-select v-model="selectedToTag" placeholder="請選擇to_tag">
-            <el-option v-for="tag in tags" :key="tag.id" :label="tag.name" :value="tag.id"></el-option>
-          </el-select>
-        </div>
-        <div class="item">
-          <div class="title">Cassttle ID</div>
-          <el-input v-model="selectedCst"></el-input>
-        </div>
-      </div>
+        <div v-else>
+          <div class="d-flex">
+            <div class="item">
+              <div class="title">起點</div>
+              <el-select v-model="selectedTag" placeholder="請選擇起點">
+                <el-option v-for="tag in tags" :key="tag.id" :label="tag.name" :value="tag.id"></el-option>
+              </el-select>
+            </div>
+            <div class="item">
+              <div class="title mx-1">終點</div>
+              <el-select v-model="selectedToTag" placeholder="請選擇終點">
+                <el-option v-for="tag in tags" :key="tag.id" :label="tag.name" :value="tag.id"></el-option>
+              </el-select>
+            </div>
+          </div>
 
-      <div class="text-start">
-        <b-button
-          @click="TaskDeliveryBtnClickHandle"
-          style="width:323px"
-          variant="primary"
-          block
-        >派送任務</b-button>
+          <div class="item">
+            <div class="title">載物ID</div>
+            <el-input v-model="selectedCst" placeholder="請輸入載物ID"></el-input>
+          </div>
+        </div>
       </div>
     </div>
-    <MapShowVue style="height:600px" ref="map"></MapShowVue>
+    <MapShowVue class="flex-fill" style="height:600px" ref="map"></MapShowVue>
     <b-modal
       @ok="TaskDeliveryHandle"
       v-model="confirm_dialog_show"
@@ -99,7 +103,7 @@ export default {
       confirm_dialog_show: false,
       notify_dialog_show: false,
       notify_text: '',
-      selectedAction: 'move', // 選擇的Action
+      selectedAction: 'None', // 選擇的Action
       selectedTag: '', // 選擇的tag_id
       selectedCst: '', // 選擇的cst_id
       selectedToTag: '', // 選擇的to_tag
@@ -154,7 +158,7 @@ export default {
         this.notify_dialog_show = true;
         return;
       }
-      if ((this.selectedAction == 'carry' | this.selectedAction == 'Load' | this.selectedAction == 'Unload') && (this.selectedCst == '' | this.selectedCst == undefined)) {
+      if ((this.selectedAction == 'Carry' | this.selectedAction == 'Load' | this.selectedAction == 'Unload') && (this.selectedCst == '' | this.selectedCst == undefined)) {
         this.notify_text = '尚未選擇CST ID';
         this.notify_dialog_show = true;
         return;
@@ -239,7 +243,7 @@ export default {
     flex-direction: row;
     margin: 10px auto;
     .title {
-      width: 120px;
+      width: 70px;
       text-align: left;
     }
   }
