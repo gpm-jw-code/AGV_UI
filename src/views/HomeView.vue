@@ -5,9 +5,13 @@
       <div class="status d-flex flex-row">
         <div class="sys-name bg-success flex-fill d-flex flex-row justify-content-center">
           <div>GPM AGV</div>
-          <!-- <div v-if="VMSData.Simulation" class="simulation-mode p-1 mx-2">SIMULATION</div> -->
         </div>
-        <div class="agvc-name flex-fill" @click="where_r_u()">{{VMSData.CarName}}</div>
+
+        <div
+          v-bind:class="VMSData.SubState.toLowerCase()"
+          class="agvc-name flex-fill"
+          @click="where_r_u()"
+        >{{VMSData.CarName}}</div>
         <div class="account-name flex-fill">{{Operator_role }}</div>
         <div class="version-name flex-fill">{{ App_version }}</div>
       </div>
@@ -261,7 +265,7 @@ export default {
       previous_tagID: -99,
       ws: null,
       previousAGVPoseIsError: false,
-      ShowAGVPoseErrorModel: false
+      ShowAGVPoseErrorModel: false,
     }
   },
   methods: {
@@ -415,7 +419,7 @@ export default {
         title: '限速',
         message: `Tag[${tag}] AGV 速度限制 : ${speed_limit} `,
         type: 'warning',
-        duration: 3000
+        duration: 1000
       })
     },
     AGVPoseErrorHandler() {
@@ -500,7 +504,7 @@ export default {
           this.wait_online_request_dialog_show = false;
         }, 1000);
       }
-    },
+    }
   },
   computed: {
     alarmResetBtnVariant() {
@@ -614,7 +618,6 @@ export default {
 
 .status {
   .sys-name,
-  .agvc-name,
   .account-name,
   .version-name {
     margin: auto 1px;
@@ -628,7 +631,9 @@ export default {
     margin-left: 0;
   }
   .agvc-name {
-    background-color: rgb(0, 197, 211);
+    margin: auto 1px;
+    font-weight: bold;
+    font-size: 22px; //background-color: rgb(0, 197, 211);
   }
   .account-name {
     background-color: rgb(23, 162, 184);
@@ -659,41 +664,6 @@ export default {
   }
   .opt-buttons {
     font-weight: bold;
-    .stop,
-    .alarm,
-    .down {
-      background-color: rgb(220, 53, 69);
-    }
-    .initialize,
-    .initializing {
-      animation: initializing-color-change 1s infinite;
-    }
-    .idle,
-    .run,
-    .charging,
-    .working,
-    .warning {
-      background-color: rgb(13, 110, 253);
-    }
-
-    @keyframes initializing-color-change {
-      0% {
-        background-color: rgb(13, 110, 253);
-        color: white;
-      }
-      50% {
-        background-color: white;
-        color: rgb(13, 110, 253);
-      }
-      100% {
-        background-color: rgb(13, 110, 253);
-        color: white;
-      }
-      // 100% {
-      //   background-color: red;
-      //   color: white;
-      // }
-    }
   }
 }
 

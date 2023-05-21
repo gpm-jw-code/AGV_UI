@@ -4,18 +4,18 @@
       <div class="item">
         <div class="title">Action</div>
         <el-select v-model="selectedAction" placeholder="請選擇Action">
-          <el-option label="移動" value="move"></el-option>
-          <el-option label="停車" value="park"></el-option>
-          <el-option label="搬運" value="carry"></el-option>
-          <el-option label="Load" value="load"></el-option>
-          <el-option label="Unload" value="unload"></el-option>
-          <el-option label="充電" value="charge"></el-option>
+          <el-option label="移動" value="None"></el-option>
+          <el-option label="停車" value="Park"></el-option>
+          <el-option label="搬運" value="Carry"></el-option>
+          <el-option label="Load" value="Load"></el-option>
+          <el-option label="Unload" value="Unload"></el-option>
+          <el-option label="充電" value="Charge"></el-option>
         </el-select>
       </div>
 
-      <!-- For Move -->
+      <!-- For Movable -->
       <div
-        v-if="selectedAction === 'move'|selectedAction === 'unload'|selectedAction === 'load'|selectedAction === 'charge'|selectedAction === 'park'"
+        v-if="selectedAction === 'None'|selectedAction === 'Unload'|selectedAction === 'Load'|selectedAction === 'Charge'|selectedAction === 'Park'"
       >
         <div class="item">
           <div class="title">目的地</div>
@@ -132,15 +132,15 @@ export default {
   },
   computed: {
     From_Lable_display() {
-      if (this.selectedAction === 'move' | this.selectedAction === 'park')
+      if (this.selectedAction === 'None' | this.selectedAction === 'Park')
         return "目的地"
       else return 'From'
     },
     tags() {
-      if (this.selectedAction == 'move')
+      if (this.selectedAction == 'None')
         return this.moveable_tags;
 
-      else if (this.selectedAction == 'charge')
+      else if (this.selectedAction == 'Charge')
         return this.chargable_tags;
       else
         return this.parkable_tags;
@@ -149,12 +149,12 @@ export default {
   methods: {
     TaskDeliveryBtnClickHandle() {
 
-      if (this.selectedAction == 'carry' && (this.selectedToTag == '' | this.selectedToTag == undefined)) {
+      if (this.selectedAction == 'Carry' && (this.selectedToTag == '' | this.selectedToTag == undefined)) {
         this.notify_text = '尚未選擇目的地';
         this.notify_dialog_show = true;
         return;
       }
-      if ((this.selectedAction == 'carry' | this.selectedAction == 'load' | this.selectedAction == 'unload') && (this.selectedCst == '' | this.selectedCst == undefined)) {
+      if ((this.selectedAction == 'carry' | this.selectedAction == 'Load' | this.selectedAction == 'Unload') && (this.selectedCst == '' | this.selectedCst == undefined)) {
         this.notify_text = '尚未選擇CST ID';
         this.notify_dialog_show = true;
         return;

@@ -19,3 +19,77 @@
   padding: 0.35rem 1.25rem;
   font-size: 2.5rem;
 }
+
+.opt-buttons{
+    .stop,
+    .alarm,
+    .down {
+      background-color: rgb(220, 53, 69);
+    }
+    .charging,
+    .warning,
+    
+    .idle,
+    .run,.working {
+      background-color: rgb(13, 110, 253);
+    }
+
+    .initialize,
+    .initializing {
+      animation: initializing-color-change 1s infinite;
+    }
+}
+
+
+.status,.status-tb{
+
+
+    .stop,
+    .alarm,
+    .down {
+      background-color: rgb(220, 53, 69);
+      color:white;
+    }
+   
+    .idle{
+        background-color: rgb(255, 200, 37);
+        color:rgb(13, 110, 253);
+      }
+    .run,.working{
+        background-color: rgb(53, 163, 101);
+        color:white;
+    }
+    .charging,
+    .warning {      
+
+      background-color: rgb(13, 110, 253);
+      color:white;
+    }
+
+    .initialize,
+    .initializing {
+        animation: initializing-color-change 1s infinite;
+        color: rgb(13, 110, 253);
+        background-color: white;
+    }
+}
+
+
+@keyframes initializing-color-change {
+  0% {
+    background-color: rgb(13, 110, 253);
+    color: white;
+  }
+  50% {
+    background-color: white;
+    color: rgb(13, 110, 253);
+  }
+  100% {
+    background-color: rgb(13, 110, 253);
+    color: white;
+  }
+  // 100% {
+  //   background-color: red;
+  //   color: white;
+  // }
+}
