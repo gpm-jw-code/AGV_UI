@@ -108,6 +108,7 @@ export default {
       this.currentTabs = currentTabs;
       if (currentTabs == 1)
         bus.emit('/alarmtable_tab_click')
+      this.$emit('OnTabChanged', this.currentTabs);
     },
   },
 }
