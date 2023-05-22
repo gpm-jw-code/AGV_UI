@@ -60,7 +60,53 @@
         </div>
       </div>
     </div>
-    <MapShowVue class="flex-fill" style="height:600px" ref="map"></MapShowVue>
+    <MapShowVue
+      :task_allocatable="true"
+      @OnFeatureClicked="MapFeatureClickedHandle"
+      class="flex-fill"
+      style="height:600px"
+      ref="map"
+    ></MapShowVue>
+    <el-drawer v-model="ShowTaskAllocateDrawer" direction="btt">
+      <template #header>
+        <h2 class="text-start">Tag-{{SelectedFeature==undefined? "": SelectedFeature.getId()}}</h2>
+      </template>
+      <div class="px-1 d-flex flex-row justify-content-around">
+        <b-button
+          class="my-1 action-button"
+          variant="primary"
+          @click="handleTaskAllocatModeMenuClick('None')"
+          :disabled="!SelectedFeatureMovable"
+        >
+          <i class="bi bi-arrows-move"></i>移動
+        </b-button>
+        <b-button
+          class="my-1 action-button"
+          variant="primary"
+          @click="handleTaskAllocatModeMenuClick('Load')"
+          :disabled="!SelectedFeatureLDULDable"
+        >
+          <i class="bi bi-box-arrow-up-right"></i>放貨
+        </b-button>
+        <b-button
+          class="my-1 action-button"
+          variant="primary"
+          @click="handleTaskAllocatModeMenuClick('Unload')"
+          :disabled="!SelectedFeatureLDULDable"
+        >
+          <i class="bi bi-box-arrow-in-down-left"></i>取貨
+        </b-button>
+
+        <b-button
+          class="my-1 action-button"
+          variant="success"
+          @click="handleTaskAllocatModeMenuClick('Charge')"
+          :disabled="!SelectedFeatureChargable"
+        >
+          <i class="bi bi-battery-charging"></i>充電
+        </b-button>
+      </div>
+    </el-drawer>
     <b-modal
       @ok="TaskDeliveryHandle"
       v-model="confirm_dialog_show"
@@ -102,6 +148,8 @@ export default {
     return {
       confirm_dialog_show: false,
       notify_dialog_show: false,
+      ShowTaskAllocateDrawer: false,
+      SelectedFeature: undefined, //從map 點選的feature物件
       notify_text: '',
       selectedAction: 'None', // 選擇的Action
       selectedTag: '', // 選擇的tag_id
@@ -122,6 +170,10 @@ export default {
         { id: 5, name: '標籤5' },
       ],
       chargable_tags: [ // tag_id選項
+        { id: 50, name: '充電站(TAG-50)' },
+        { id: 70, name: '充電站(TAG-70)' },
+      ],
+      lduldable_tags: [ // tag_id選項
         { id: 50, name: '充電站(TAG-50)' },
         { id: 70, name: '充電站(TAG-70)' },
       ],
@@ -148,6 +200,37 @@ export default {
         return this.chargable_tags;
       else
         return this.parkable_tags;
+    },
+    SelectedFeatureMovable() {
+      if (!this.SelectedFeature)
+        return false;
+      this.GetNormalStationTagsFromMap();
+      var l = this.moveable_tags.filter(i => i.id == this.SelectedFeature.getId())
+      return l.length == 1;
+    },
+    SelectedFeatureLDULDable() {
+      if (!this.SelectedFeature)
+        return false;
+      this.GetLDULDStationTagsFromMap();
+      var l = this.lduldable_tags.filter(i => i.id == this.SelectedFeature.getId())
+      return l.length == 1;
+    },
+    SelectedFeatureChargable() {
+      if (!this.SelectedFeature)
+        return false;
+      this.GetChargeStationTagsFromMap();
+      var l = this.chargable_tags.filter(i => i.id == this.SelectedFeature.getId())
+      return l.length == 1;
+    },
+    ActionText() {
+      if (this.selectedAction == 'None')
+        return '移動';
+      if (this.selectedAction == 'Charge')
+        return '充電';
+      if (this.selectedAction == 'Load')
+        return '放貨';
+      if (this.selectedAction == 'Unload')
+        return '取貨';
     }
   },
   methods: {
@@ -211,6 +294,75 @@ export default {
         });
       })
 
+    },
+    GetChargeStationTagsFromMap() {
+      var charge_stations = this.$refs['map'].GetChargeStations();
+      console.info(charge_stations);
+
+      function compare(a, b) {
+        if (a.TagNumber < b.TagNumber) {
+          return -1;
+        }
+        if (a.TagNumber > b.TagNumber) {
+          return 1;
+        }
+        return 0;
+      }
+      charge_stations.sort(compare);
+      this.chargable_tags = [];
+      charge_stations.forEach(station => {
+
+        this.chargable_tags.push({
+          id: station.TagNumber,
+          name: '(Charge)' + station.TagNumber
+        });
+      })
+
+    },
+    GetLDULDStationTagsFromMap() {
+      var lduld_stations = this.$refs['map'].GetSTKStations();
+      function compare(a, b) {
+        if (a.TagNumber < b.TagNumber) {
+          return -1;
+        }
+        if (a.TagNumber > b.TagNumber) {
+          return 1;
+        }
+        return 0;
+      }
+      lduld_stations.sort(compare);
+      this.lduldable_tags = [];
+      lduld_stations.forEach(station => {
+
+        this.lduldable_tags.push({
+          id: station.TagNumber,
+          name: '(LDULD)' + station.TagNumber
+        });
+      })
+
+    },
+    handleTaskAllocatModeMenuClick(action) {
+      this.selectedAction = action;
+      this.selectedToTag = this.SelectedFeature.getId();
+      this.ShowTaskAllocateDrawer = false;
+      this.$swal.fire({
+        title: '任務派送確認',
+        text: `確定要執行${this.ActionText} 任務?(Tag ${this.selectedToTag})`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '確認',
+        customClass: 'my-sweetalert'
+      }).then(result => {
+        if (result.isConfirmed) {
+          this.TaskDeliveryHandle();
+        }
+      })
+
+    },
+    MapFeatureClickedHandle(feature) {
+      this.SelectedFeature = feature
+      if (this.SelectedFeature)
+        this.ShowTaskAllocateDrawer = true;
     }
   },
   mounted() {
@@ -246,6 +398,12 @@ export default {
       width: 70px;
       text-align: left;
     }
+  }
+
+  .action-button {
+    font-size: 40px;
+    width: 200px;
+    height: 80px;
   }
 }
 </style>

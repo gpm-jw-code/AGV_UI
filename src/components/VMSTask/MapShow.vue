@@ -384,8 +384,10 @@ export default {
     GetSTKStations() {
       if (!this.map_data)
         return [];
+
+      const lduldable_types = [1, 2, 4, 5, 6, 11, 12, 21, 22];
       var stations = Object.values(this.map_data.Points);
-      return stations.filter(st => st.StationType == 2);
+      return stations.filter(st => lduldable_types.includes(st.StationType));
     },
     GetChargeStations() {
       if (!this.map_data)
@@ -468,8 +470,11 @@ export default {
 
       // 监听 feature 的右键点击事件
       this.map.on('pointerdown', (event) => {
-        if (event.originalEvent.button === 2) {
+        if (event.originalEvent.button === 2 | event.originalEvent.button === 0) {
           this.selected_feature = this.map.forEachFeatureAtPixel(event.pixel, (feature) => {
+            setTimeout(() => {
+              this.$emit('OnFeatureClicked', feature)
+            }, 100);
             return feature;
           });
         }

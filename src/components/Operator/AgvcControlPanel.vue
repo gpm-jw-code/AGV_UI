@@ -81,8 +81,8 @@ export default {
   },
   data() {
     return {
-      linear_speed: 0.08,
-      rotation_speed: 0.1,
+      linear_speed: 0.2,
+      rotation_speed: 0.2,
       speed_modifyable: false
     }
   },
