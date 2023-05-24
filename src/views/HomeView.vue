@@ -331,11 +331,29 @@ export default {
       await BuzzerOff();
     },
     async AGVRemoveCassette() {
-      await RemoveCassette();
-      setTimeout(() => {
-        Notifier.Success("CST Data Already Clear", 'bottom', 1000);
-        this.remove_CstData_ComfirmDialog_Show = false;
-      }, 300);
+
+      var success = await RemoveCassette();
+      var swal_title = "";
+      var swal_text = "";
+      var swal_icon = "";
+
+      if (success) {
+        swal_title = swal_text = "移除卡匣成功";
+        swal_icon = "success";
+      } else {
+        swal_title = swal_text = "移除卡匣失敗";
+        swal_icon = "error";
+      }
+
+      this.$swal.fire({
+        title: swal_title,
+        text: swal_text,
+        icon: swal_icon,
+        showCancelButton: false,
+        confirmButtonText: 'OK',
+        customClass: 'my-sweetalert'
+      })
+
     },
     AGVSMsgIOWebsocketInit() {
       var ws = new WebSocketHelp('ws/AGVS_MSG_IO');

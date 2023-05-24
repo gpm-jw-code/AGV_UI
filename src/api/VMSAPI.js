@@ -32,7 +32,7 @@ export async function BuzzerOff() {
 }
 export async function RemoveCassette() {
   var ret = await axios_entity.post('api/VMS/RemoveCassette')
-  return ret
+  return ret.data;
 }
 
 export const MOVEControl = {
