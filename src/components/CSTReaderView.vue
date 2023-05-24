@@ -85,7 +85,7 @@ export default {
   }
 }
 .barcode-tooltip {
-  z-index: 9999;
+  z-index: 12;
   color: #0d6efd;
   position: relative;
   top: -225px;
@@ -99,7 +99,7 @@ export default {
   position: absolute;
   top: 288px;
   left: 419px;
-  z-index: 999999;
+  z-index: 12;
   color: white;
   border: 3px solid red;
   height: 100px;
