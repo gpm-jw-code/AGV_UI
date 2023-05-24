@@ -89,7 +89,12 @@
             </td>
             <td>{{$t('carrier_id')}}</td>
             <td class="val-column">
-              <b-form-input size="sm" disabled v-model="vms_data.CST_Data"></b-form-input>
+              <b-form-input
+                size="sm"
+                disabled
+                v-model="vms_data.CST_Data"
+                :state="vms_data.CST_Data!='ERROR'"
+              ></b-form-input>
             </td>
           </tr>
           <tr v-if="true" align="justify">
@@ -104,7 +109,12 @@
             </td>
             <td>地圖比對率</td>
             <td>
-              <b-form-input size="sm" disabled v-model="vms_data.MapComparsionRate"></b-form-input>
+              <b-form-input
+                size="sm"
+                disabled
+                v-model="vms_data.MapComparsionRate"
+                :state="vms_data.MapComparsionRate!=0"
+              ></b-form-input>
             </td>
           </tr>
           <tr align="justify">
