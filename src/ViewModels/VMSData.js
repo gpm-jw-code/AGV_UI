@@ -42,6 +42,7 @@ class VMSData {
     PathPlan:[]
   }
   MapComparsionRate = -1
+  LocStatus = 10
   AlarmCodes = []
   NewestAlarm = undefined
   AGV_Direct = 'STOP'

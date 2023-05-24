@@ -92,17 +92,26 @@
               <b-form-input size="sm" disabled v-model="vms_data.CST_Data"></b-form-input>
             </td>
           </tr>
+          <tr v-if="true" align="justify">
+            <td>定位狀態</td>
+            <td>
+              <b-form-input
+                size="sm"
+                disabled
+                v-model="LocStatusDisplay"
+                :state="LocStatusDisplay=='OK'"
+              ></b-form-input>
+            </td>
+            <td>地圖比對率</td>
+            <td>
+              <b-form-input size="sm" disabled v-model="vms_data.MapComparsionRate"></b-form-input>
+            </td>
+          </tr>
           <tr align="justify">
             <td>{{$t('abormal')}}</td>
             <td colspan="4">
               <b-form-textarea disabled v-model="NewestAlarm" :state="NewestAlarm==''"></b-form-textarea>
               <!-- <el-input type="textarea" disabled v-model="NewestAlarm"></el-input> -->
-            </td>
-          </tr>
-          <tr v-if="true" align="justify">
-            <td>地圖比對率</td>
-            <td>
-              <b-form-input size="sm" disabled v-model="vms_data.MapComparsionRate"></b-form-input>
             </td>
           </tr>
           <tr v-if="false" align="justify">
@@ -166,6 +175,25 @@ export default {
         return '';
 
       return this.$i18n.locale == 'zh-TW' ? this.vms_data.NewestAlarm.CN : this.vms_data.NewestAlarm.Description;
+    },
+    LocStatusDisplay() {
+      //  1 byte LocalizationStatus [10: OK, 20: Warning, 30: Not localized, 40: System error] -->
+      var locStatus = this.vms_data.LocStatus;
+      if (locStatus == 10) {
+        return "OK"
+      }
+      else if (locStatus == 20) {
+        return "Warning"
+      }
+      else if (locStatus == 30) {
+        return "Not Localized"
+      }
+      else if (locStatus == 40) {
+        return "System Error"
+      }
+      else {
+        return "Unknown"
+      }
     }
   },
 
