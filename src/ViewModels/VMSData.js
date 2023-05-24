@@ -1,6 +1,7 @@
 import clsDriverState from './clsDriverState'
 import BatteryStatus from './BatteryStatus'
 class VMSData {
+  APPVersion = "1.0.0"
   Agv_Type = 0
   Simulation = false
   MainState = 'DOWN'

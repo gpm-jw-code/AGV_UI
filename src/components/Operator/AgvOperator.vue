@@ -36,8 +36,8 @@
       </b-tab>
     </b-tabs>
     <div @click="VersionTextClickHandle()" class="ui-version text-end px-3">
-      UI Version:Beta
-      <p>1.0.1</p>
+      UI Version:
+      <p>{{UIVersion}}</p>
     </div>
   </div>
 </template>
@@ -47,7 +47,7 @@ import AgvControl from './AgvcControl.vue'
 import ZAxisControl from './ZAxisControl.vue'
 import ZAxisControl_hao from './ZAxisControl_Hao.vue'
 import IOTable from './IOTable.vue';
-import param from '@/gpm_param';
+import { param, version } from '@/gpm_param';
 import clsDIOTable from '@/ViewModels/clsDIOTable';
 import ManualSettings from './ManualSettings.vue';
 import WebSocketHelp from '@/api/WebSocketHepler'
@@ -70,7 +70,6 @@ export default {
     }
   },
   mounted() {
-    this.type = param.type;
     this.DIOTableWSInit();
   },
   methods: {
@@ -133,6 +132,12 @@ export default {
     }
   },
   computed: {
+    UIVersion() {
+      if (version)
+        return version;
+      else
+        return "0.0.0.0";
+    },
     operation_enabled_return() {
       if (this.isGodMode)
         return true;

@@ -13,7 +13,7 @@
           @click="where_r_u()"
         >{{VMSData.CarName}}</div>
         <div class="account-name flex-fill">{{Operator_role }}</div>
-        <div class="version-name flex-fill">{{ App_version }}</div>
+        <div class="version-name flex-fill">{{ VMSData.APPVersion }}</div>
       </div>
       <div
         v-bind:class="VMSData.LightsStates.Front?'light-on-front':'light-off-front'"
@@ -381,54 +381,49 @@ export default {
     VMSDataWebsocketInit() {
       var ws = new WebSocketHelp('ws/AGVCState');
       ws.Connect();
-      var socket = ws.wssocket;
-      socket.onmessage = (event) => {
+      setTimeout(() => {
+        var socket = ws.wssocket;
+        socket.onmessage = (event) => {
 
-        this.back_end_server_err = false;
-        this.back_end_server_connecting = false;
-        this.VMSData = JSON.parse(event.data);
-        // class info{
-        //     AGV_Name
-        //     Current_Tag
-        //     State
-        //     IsOnline
-        //     Rotation
-        // }
-        //agv_data: info[] 
-        if (this.VMSData.Tag > 0) {
-          bus.emit('/agv_name_list', [{
-            AGV_Name: this.VMSData.CarName,
-            Current_Tag: this.VMSData.Tag,
-            State: this.VMSData.MainState,
-            IsOnline: this.VMSData.OnlineMode == 1,
-            Rotation: 0
-          }])
+          this.back_end_server_err = false;
+          this.back_end_server_connecting = false;
+          this.VMSData = JSON.parse(event.data);
+          if (this.VMSData.Tag > 0) {
+            bus.emit('/agv_name_list', [{
+              AGV_Name: this.VMSData.CarName,
+              Current_Tag: this.VMSData.Tag,
+              State: this.VMSData.MainState,
+              IsOnline: this.VMSData.OnlineMode == 1,
+              Rotation: 0
+            }])
 
-          if (this.VMSData.Tag != this.previous_tagID) {
-            Notifier.Primary(`Tag Detected:${this.VMSData.Tag}`, 'bottom', 1500);
-            this.ShowMaxSpeedLimitNotification(this.VMSData.Tag, this.VMSData.NavInfo.Speed_max_limit);
-            bus.emit('/nav_path_update', {
-              name: this.VMSData.CarName,
-              tags: this.VMSData.NavInfo.PathPlan
-            })
+            if (this.VMSData.Tag != this.previous_tagID) {
+              Notifier.Primary(`Tag Detected:${this.VMSData.Tag}`, 'bottom', 1500);
+              this.ShowMaxSpeedLimitNotification(this.VMSData.Tag, this.VMSData.NavInfo.Speed_max_limit);
+              bus.emit('/nav_path_update', {
+                name: this.VMSData.CarName,
+                tags: this.VMSData.NavInfo.PathPlan
+              })
+            }
           }
+          this.previous_tagID = this.VMSData.Tag;
+          this.AGVPoseErrorHandler();
+          this.BusPublishDataOut();
+        };
+        socket.onclose = () => {
+          this.back_end_server_connecting = false;
+          this.back_end_server_err = true;
+          this.server_err_state_text = "後端伺服器異常";
+          this.VMSDataWebsocketInit()
         }
-        this.previous_tagID = this.VMSData.Tag;
-        this.AGVPoseErrorHandler();
-        this.BusPublishDataOut();
-      };
-      socket.onclose = () => {
-        this.back_end_server_connecting = false;
-        this.back_end_server_err = true;
-        this.server_err_state_text = "後端伺服器異常";
-        this.VMSDataWebsocketInit()
-      }
-      socket.onerror = () => {
-        this.back_end_server_connecting = false;
-        this.server_err_state_text = "後端伺服器異常";
-        this.back_end_server_err = true;
-      }
-      this.ws = ws;
+        socket.onerror = () => {
+          this.back_end_server_connecting = false;
+          this.server_err_state_text = "後端伺服器異常";
+          this.back_end_server_err = true;
+        }
+        this.ws = ws;
+      }, 400);
+
     },
     ShowMaxSpeedLimitNotification(tag, speed_limit) {
       if (speed_limit == -1)
