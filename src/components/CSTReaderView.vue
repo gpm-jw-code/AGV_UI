@@ -3,14 +3,14 @@
     <div class="opt">
       <b-button :disabled="triggering" class="mx-1" variant="primary" @click="TriggerHandle">
         <i class="bi bi-camera-fill mx-1"></i>
-        <span>Trigger</span>
+        <span>拍照</span>
       </b-button>
-      <b-button :disabled="!triggering" variant="danger" @click="StopHandle">Stop</b-button>
+      <b-button :disabled="!triggering" variant="danger" @click="StopHandle">STOP</b-button>
     </div>
 
     <div class="p-5">
       <img ref="image" src="/tray.jpg" height="400" alt="QR Code" />
-      <div v-show="qrCodeValue!=''" class="barcode_select"></div>
+      <div class="barcode_select"></div>
       <div
         v-show="qrCodeValue!=''"
         v-loading="triggering"
@@ -104,6 +104,8 @@ export default {
   border: 3px solid red;
   height: 100px;
   width: 30px;
+  border-radius: 10px;
+  transform: rotate(0.02turn);
 }
 .ERROR {
   color: red;

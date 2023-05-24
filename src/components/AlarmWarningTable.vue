@@ -131,7 +131,7 @@ export default {
     },
     async ClearAlarmRecords() {
       await AlarmTableAPI.ClearAlarms();
-      Notifier.Success("Alarm Clear");
+      Notifier.Success("Alarm Clear", "bottom", 1000);
       await this.AlarmDownload();
     }
   },

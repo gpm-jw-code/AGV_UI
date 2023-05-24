@@ -553,7 +553,7 @@ export default {
       this.CurrentUserinfo = user_info;
       this.Operator_role = this.CurrentUserinfo.GetRoleName()
       this.LoginBtnText = '登出'
-      Notifier.Success(`${this.CurrentUserinfo.UserName}(${this.CurrentUserinfo.Role}) Login Success`);
+      Notifier.Success(`${this.CurrentUserinfo.UserName}(${this.CurrentUserinfo.Role}) Login Success`, 'bottom', 700);
     })
     bus.on('/god_mode_changed', (is_god_mode_now) => {
       this.is_god_mode_now = is_god_mode_now
