@@ -24,7 +24,7 @@
         </div>
       </b-tab>
 
-      <b-tab v-if="true" title="CST READER">
+      <b-tab v-if="true" title="Tray Reader">
         <div class="mt-3 border p-1">
           <CSTReader></CSTReader>
         </div>
