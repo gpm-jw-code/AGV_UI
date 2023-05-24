@@ -74,15 +74,10 @@ export default {
   },
   methods: {
     DIOTableWSInit() {
-
       var ws = new WebSocketHelp('ws/DIOTableData')
       ws.Connect();
-
-      ws.wssocket.onmessage = (evt) => {
+      ws.onmessage = (evt) => {
         this.DIOTableData = JSON.parse(evt.data)
-      }
-      ws.wssocket.onclose = () => {
-        this.DIOTableWSInit()
       }
     },
     VersionTextClickHandle() {

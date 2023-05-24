@@ -87,16 +87,10 @@ export default {
 
       var _ws = new WebSocketHelp('ws/ConnectionState');
       _ws.Connect();
-      _ws.wssocket.onmessage = (ev) => {
+      _ws.onmessage = (ev) => {
         var data = JSON.parse(ev.data)
         this.connections = data;
       }
-      _ws.wssocket.onclose = () => {
-        this.connections.RosbridgeServer = this.connections.AGVC = 'DISCONNECT';
-        this.WebSocketConnect();
-        console.log('ws/ConnectionState close');
-      }
-
     }
   },
   mounted() {

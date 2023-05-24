@@ -358,8 +358,7 @@ export default {
     AGVSMsgIOWebsocketInit() {
       var ws = new WebSocketHelp('ws/AGVS_MSG_IO');
       ws.Connect();
-      var socket = ws.wssocket;
-      socket.onmessage = (event) => {
+      ws.onmessage = (event) => {
         var msg_io_data = JSON.parse(event.data);
         if (this.$refs['agvs_msg_table'] != undefined) {
           this.$refs['agvs_msg_table'].AddNewMsgData(msg_io_data);
@@ -379,50 +378,67 @@ export default {
       };
     },
     VMSDataWebsocketInit() {
-      var ws = new WebSocketHelp('ws/AGVCState');
-      ws.Connect();
-      setTimeout(() => {
-        var socket = ws.wssocket;
-        socket.onmessage = (event) => {
+      this.ws = new WebSocketHelp('ws/AGVCState');
+      this.ws.Connect();
 
-          this.back_end_server_err = false;
-          this.back_end_server_connecting = false;
-          this.VMSData = JSON.parse(event.data);
-          if (this.VMSData.Tag > 0) {
-            bus.emit('/agv_name_list', [{
-              AGV_Name: this.VMSData.CarName,
-              Current_Tag: this.VMSData.Tag,
-              State: this.VMSData.MainState,
-              IsOnline: this.VMSData.OnlineMode == 1,
-              Rotation: 0
-            }])
+      this.ws.onmessage = (event) => {
 
-            if (this.VMSData.Tag != this.previous_tagID) {
-              Notifier.Primary(`Tag Detected:${this.VMSData.Tag}`, 'bottom', 1500);
-              this.ShowMaxSpeedLimitNotification(this.VMSData.Tag, this.VMSData.NavInfo.Speed_max_limit);
-              bus.emit('/nav_path_update', {
-                name: this.VMSData.CarName,
-                tags: this.VMSData.NavInfo.PathPlan
-              })
-            }
+        this.back_end_server_err = false;
+        this.back_end_server_connecting = false;
+
+        this.VMSData = JSON.parse(event.data);
+        if (this.VMSData.Tag > 0) {
+          bus.emit('/agv_name_list', [{
+            AGV_Name: this.VMSData.CarName,
+            Current_Tag: this.VMSData.Tag,
+            State: this.VMSData.MainState,
+            IsOnline: this.VMSData.OnlineMode == 1,
+            Rotation: 0
+          }])
+
+          if (this.VMSData.Tag != this.previous_tagID) {
+            Notifier.Primary(`Tag Detected:${this.VMSData.Tag}`, 'bottom', 1500);
+            this.ShowMaxSpeedLimitNotification(this.VMSData.Tag, this.VMSData.NavInfo.Speed_max_limit);
+            bus.emit('/nav_path_update', {
+              name: this.VMSData.CarName,
+              tags: this.VMSData.NavInfo.PathPlan
+            })
           }
-          this.previous_tagID = this.VMSData.Tag;
-          this.AGVPoseErrorHandler();
-          this.BusPublishDataOut();
-        };
-        socket.onclose = () => {
-          this.back_end_server_connecting = false;
-          this.back_end_server_err = true;
-          this.server_err_state_text = "後端伺服器異常";
-          this.VMSDataWebsocketInit()
         }
-        socket.onerror = () => {
-          this.back_end_server_connecting = false;
-          this.server_err_state_text = "後端伺服器異常";
-          this.back_end_server_err = true;
-        }
-        this.ws = ws;
-      }, 400);
+        this.previous_tagID = this.VMSData.Tag;
+        this.AGVPoseErrorHandler();
+        this.BusPublishDataOut();
+      }
+      this.ws.onclose = (ev) => {
+        this.back_end_server_connecting = false;
+        this.server_err_state_text = "後端伺服器異常";
+        this.back_end_server_err = true;
+        this.ws.onclose = null;
+        var id = setInterval(() => {
+          console.info(this.ws.wssocket.readyState);
+          if (this.ws.wssocket.readyState == WebSocket.OPEN) {
+            this.ws.onmessage = null;
+            console.log('reload ');
+            this.back_end_server_err = this.back_end_server_connecting = true;
+            this.$swal.fire({
+              title: `Page Reload`,
+              text: `Reconnect! Page will reload after 3 seconds.`,
+              icon: 'information',
+              showCancelButton: false,
+              confirmButtonText: 'OK',
+              customClass: 'my-sweetalert'
+            })
+            clearInterval(id)
+            setTimeout(() => {
+              location.reload()
+            }, 3000);
+            return;
+          }
+          if (this.ws.wssocket.readyState == WebSocket.CLOSED)
+            this.ws.ReconnectWorker();
+        }, 1000);
+
+      }
 
     },
     ShowMaxSpeedLimitNotification(tag, speed_limit) {
