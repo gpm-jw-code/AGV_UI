@@ -24,7 +24,7 @@
         </div>
       </b-tab>
 
-      <b-tab title="AGVS MSG">
+      <b-tab v-if="false" title="AGVS MSG">
         <div class="mt-3 border p-1">
           <AGVSMsgDisplay ref="agvs_msg_table"></AGVSMsgDisplay>
         </div>
@@ -35,7 +35,7 @@
         </div>
       </b-tab>
 
-      <b-tab v-if="false" title="CST READER">
+      <b-tab v-if="true" title="CST READER">
         <div class="mt-3 border p-1">
           <CSTReader></CSTReader>
         </div>
