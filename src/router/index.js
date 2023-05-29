@@ -17,6 +17,11 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "about" */ '../views/RDTestView.vue'),
   },
+  {
+    path: '/idle',
+    name: 'idle',
+    component:()=> import('../views/IdleView.vue')
+  }
 ]
 
 const router = createRouter({
