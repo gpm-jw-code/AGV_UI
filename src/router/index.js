@@ -28,7 +28,7 @@ const routes = [
         component: ()=>import('../components/Admin/Controller.vue')
       }
     ]
-  }
+  },
   {
     path: '/idle',
     name: 'idle',
