@@ -29,6 +29,11 @@ const routes = [
       }
     ]
   }
+  {
+    path: '/idle',
+    name: 'idle',
+    component:()=> import('../views/IdleView.vue')
+  }
 ]
 
 const router = createRouter({

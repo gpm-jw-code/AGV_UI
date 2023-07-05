@@ -39,6 +39,10 @@ export default {
     if (process.env.NODE_ENV != 'production') {
       this.showMenuToggleIcon = true;
     }
+    bus.on('idle', (arg) => {
+      this.$router.push('/idle')
+      // alert('idle 5 ^_^')
+    })
   },
 };
 </script>
