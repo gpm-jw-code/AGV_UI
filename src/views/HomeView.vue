@@ -12,7 +12,7 @@
           class="agvc-name flex-fill"
           @click="where_r_u()"
         >{{VMSData.CarName}}</div>
-        <div class="account-name flex-fill">{{Operator_role }}</div>
+        <div class="account-name flex-fill">{{UserName }}</div>
         <div class="version-name flex-fill">{{ VMSData.APPVersion }}</div>
       </div>
       <div
@@ -34,8 +34,6 @@
       <i class="bi bi-exclamation-diamond"></i>
       {{$t('connecting')}}
     </div>
-    <!--  -->
-
     <div class="d-flex flex-row h-100">
       <div v-bind:class="VMSData.LightsStates.Left?'light-on':'light-off'" class="h-100"></div>
       <!--Side 左側邊-->
@@ -53,7 +51,7 @@
           <b-button
             :disabled="back_end_server_err"
             @click="AGVResetAlarm()"
-            class="mb-1 p-2"
+            class="mb-1 p-2 border"
             block
             :variant="alarmResetBtnVariant"
           >
@@ -62,8 +60,8 @@
           <b-button
             :disabled="back_end_server_err"
             @click="AGVBuzzerOff()"
-            variant="outline-dark"
-            class="mb-1 p-2"
+            variant="light"
+            class="mb-1 p-2 border"
             block
           >
             <b>{{$t('buzzer_off') }}</b>
@@ -71,16 +69,16 @@
           <b-button
             :disabled="back_end_server_err"
             @click="ShowRemoveCstDialog()"
-            variant="outline-dark"
-            class="mb-1 p-2"
+            variant="light"
+            class="mb-1 p-2 border"
             block
           >
             <b>{{$t('cst-remove') }}</b>
           </b-button>
           <b-button
             :disabled="back_end_server_err"
-            variant="outline-dark"
-            class="mb-1 p-2"
+            :variant="IsLogin? 'danger':'outline-dark'"
+            class="mb-1 p-2 border"
             block
             @click="ShowLogin()"
           >
@@ -146,7 +144,7 @@
           <div class="state-title">{{$t('mileage')}}</div>
           <mileage></mileage>
         </div>
-        <div>{{ time }}</div>
+        <!-- <div>{{ time }}</div> -->
         <div>
           <emo :disabled="back_end_server_err"></emo>
         </div>
@@ -228,6 +226,7 @@ import jw_switch from "@/components/UIComponents/jw-switch.vue"
 import Notifier from "@/api/NotifyHelper.js"
 import WebSocketHelp from '@/api/WebSocketHepler'
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
+import { UserStore } from '@/store'
 import moment from 'moment'
 import MainContent from '@/components/MainContent/TabContainer.vue'
 // @ is an alias to /src
@@ -239,7 +238,7 @@ export default {
   data() {
     return {
       time: '2022/12/12 19:00:09',
-      is_god_mode_now: false,
+
       back_end_server_err: false,
       back_end_server_connecting: true,
       loading: false,
@@ -252,9 +251,6 @@ export default {
       ShowOnlineFailDialog: false,
       moduleInformation: {},
       VMSData: new VMSData(),
-      Operator_role: 'Operator',
-      CurrentUserinfo: new UserInfo('', 0),
-      LoginBtnText: '登入',
       server_err_state_text: '連線中...',
       init_btn_blink_timer: null,
       mode_switch_data: {
@@ -270,10 +266,27 @@ export default {
   },
   methods: {
     async where_r_u() {
+
       await Where_r_u();
     },
     ShowLogin() {
-      this.$refs.login.Show();
+      if (this.IsLogin) {
+        this.$swal.fire({
+          title: `Logout Confirm`,
+          text: `Logout ?`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'OK',
+          customClass: 'my-sweetalert'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            UserStore.dispatch('Logout')
+          }
+        })
+      }
+      else {
+        this.$refs.login.Show();
+      }
     },
     async AGVInitialize() {
       if (VMSData.isInitializing) {
@@ -398,7 +411,9 @@ export default {
 
           if (this.VMSData.Tag != this.previous_tagID) {
             Notifier.Primary(`Tag Detected:${this.VMSData.Tag}`, 'bottom', 1500);
-            this.ShowMaxSpeedLimitNotification(this.VMSData.Tag, this.VMSData.NavInfo.Speed_max_limit);
+            
+            //this.ShowMaxSpeedLimitNotification(this.VMSData.Tag, this.VMSData.NavInfo.Speed_max_limit);
+            
             bus.emit('/nav_path_update', {
               name: this.VMSData.CarName,
               tags: this.VMSData.NavInfo.PathPlan
@@ -536,6 +551,15 @@ export default {
     }
   },
   computed: {
+    is_god_mode_now() {
+      return UserStore.getters.IsGodUser
+    },
+    IsLogin() {
+      return UserStore.getters.CurrentUserRole != 0;
+    },
+    LoginBtnText() {
+      return this.IsLogin ? '登出' : '登入';
+    },
     alarmResetBtnVariant() {
       return this.VMSData.AlarmCodes.length > 0 ? 'danger' : 'outline-dark'
     },
@@ -570,6 +594,9 @@ export default {
       } else {
         return this.IsAutoMode ? 'Manual' : 'Auto'
       }
+    },
+    UserName() {
+      return UserStore.getters.CurrentUserName
     }
   },
   mounted() {
@@ -578,15 +605,6 @@ export default {
     // }, 200);
     this.VMSDataWebsocketInit();
     this.AGVSMsgIOWebsocketInit();
-    bus.on('/login_success', (user_info) => {
-      this.CurrentUserinfo = user_info;
-      this.Operator_role = this.CurrentUserinfo.GetRoleName()
-      this.LoginBtnText = '登出'
-      Notifier.Success(`${this.CurrentUserinfo.UserName}(${this.CurrentUserinfo.Role}) Login Success`, 'bottom', 700);
-    })
-    bus.on('/god_mode_changed', (is_god_mode_now) => {
-      this.is_god_mode_now = is_god_mode_now
-    });
     setInterval(() => {
       this.time = moment(Date.now()).format('yyyy/MM/DD HH:mm:ss');
     }, 1000);

@@ -1,9 +1,9 @@
 import {
   createRouter,
-  createWebHashHistory,
-  createMemoryHistory,
+  createWebHistory
 } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import Admin from '../views/Admin.vue'
 
 const routes = [
   {
@@ -17,10 +17,22 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "about" */ '../views/RDTestView.vue'),
   },
+  {
+    path:'/admin',
+    name:'admin',
+    component:Admin,
+    children:[
+      {
+        path:'controller',
+        name:'controller',
+        component: ()=>import('../components/Admin/Controller.vue')
+      }
+    ]
+  }
 ]
 
 const router = createRouter({
-  history: createMemoryHistory(),
+  history: createWebHistory(),
   routes,
 })
 

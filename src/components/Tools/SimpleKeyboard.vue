@@ -54,10 +54,6 @@ export default {
     },
     onKeyPress(button) {
       this.$emit("onKeyPress", button);
-
-      /**
-       * If you want to handle the shift and caps lock buttons
-       */
       if (button === "{shift}" || button === "{lock}") this.handleShift();
     },
     handleShift() {

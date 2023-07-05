@@ -29,7 +29,7 @@
           <CSTReader></CSTReader>
         </div>
       </b-tab>
-      <b-tab v-if="true" title="Task">
+      <b-tab v-if="IsGodMod" title="Task">
         <div class="mt-3 border p-1">
           <TaskDeliveryVue></TaskDeliveryVue>
         </div>
@@ -75,9 +75,9 @@ import TaskDeliveryVue from '@/components/VMSTask/TaskDelivery.vue'
 import CSTReader from '@/components/CSTReaderView.vue'
 import jw_switch from "@/components/UIComponents/jw-switch.vue"
 import Notifier from "@/api/NotifyHelper.js"
-
 import VMSData from '@/ViewModels/VMSData.js';
 import bus from '@/event-bus.js'
+import { UserStore } from '@/store'
 export default {
   components: { jw_switch, status_card, alarm_warn_table, agv_operator, ForkAGV3D, AGVSMsgDisplay, TaskDeliveryVue, CSTReader },
   props: {
@@ -111,6 +111,11 @@ export default {
       this.$emit('OnTabChanged', this.currentTabs);
     },
   },
+  computed: {
+    IsGodMod() {
+      return UserStore.getters.IsGodUser
+    }
+  }
 }
 </script>
 

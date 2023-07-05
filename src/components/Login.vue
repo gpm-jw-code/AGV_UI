@@ -18,6 +18,7 @@
             v-model="UserName"
             autocomplete="new-password"
             clearable
+            :disabled="IsLogin"
           ></el-input>
         </el-form-item>
         <el-form-item label="Password" :required="true">
@@ -34,30 +35,30 @@
             v-model="Password"
             type="password"
             autocomplete="new-password"
+            :disabled="IsLogin"
           ></el-input>
         </el-form-item>
       </el-form>
       <div class="login-message">{{ message}}</div>
-      <div class="text-end px-3">
-        <span class="dialog-footer">
-          <el-button :loading="logining" type="primary" @click="LoginHandle()">Login</el-button>
-          <el-button type="info" @click="dialogVisible = false">Cancel</el-button>
-        </span>
+      <div class="button-group py-1 my-1">
+        <el-button
+          :loading="logining"
+          :type="IsLogin?'danger':'primary'"
+          @click="LoginHandle()"
+        >{{ IsLogin?'Logout':'Login' }}</el-button>
+        <el-button type="info" @click="dialogVisible = false">Cancel</el-button>
       </div>
-      <div class="keyboard py-2">
-        <KeyBoard @onChange="onChange" :input="keyboard_input"></KeyBoard>
+      <div class="keyboard">
+        <KeyBoard @onChange="onChange" @onKeyPress="HandleKeyboardPress" :input="keyboard_input"></KeyBoard>
       </div>
     </div>
-
-    <template #footer></template>
   </el-dialog>
 </template>
 
 <script>
 import KeyBoard from '@/components/Tools/SimpleKeyboard.vue'
-import { Login } from '@/api/UserAPI';
-import bus from '@/event-bus.js';
-import UserInfo from '@/ViewModels/UserInfo.js'
+import { UserStore } from '@/store';
+import Notifier from '@/api/NotifyHelper';
 export default {
   components: {
     KeyBoard,
@@ -74,13 +75,29 @@ export default {
 
     }
   },
+  computed: {
+    IsLogin() {
+      return UserStore.getters.CurrentUserRole != 0;
+    }
+  },
   methods: {
     Show() {
-      this.message = this.UserName = this.Password = '';
+      if (!this.IsLogin) {
+        this.message = this.UserName = this.Password = '';
+      } else {
+        this.message = '';
+        this.Password = '********'
+        this.UserName = UserStore.getters.CurrentUserName;
+      }
       this.dialogVisible = true;
 
     },
     async LoginHandle() {
+
+      if (this.IsLogin) {
+        UserStore.dispatch('Logout')
+        return;
+      }
 
       if (this.UserName == '') {
         this.message = '請輸入 Account'
@@ -92,19 +109,17 @@ export default {
       }
 
       this.logining = true;
-      var user_data = await Login({
+      var response_data = await UserStore.dispatch('Login', {
         UserName: this.UserName,
         Password: this.Password
       })
-      if (user_data != undefined) {
-        var _UserInfo = new UserInfo(user_data.UserName, user_data.Role);
-
-        if (user_data.Success) {
-          this.dialogVisible = false;
-          bus.emit('/login_success', _UserInfo);
-        } else {
-          this.message = user_data.Message;
-        }
+      debugger
+      if (response_data.Success) {
+        this.dialogVisible = false;
+        Notifier.Success(`Login Success`, 'bottom', 700);
+      }
+      else {
+        this.message = response_data.Message;
       }
       this.logining = false;
     },
@@ -127,6 +142,16 @@ export default {
         this.$refs.pw_input.focus();
         this.Password = input;
         this.$refs.pw_input.focus();
+      }
+    },
+    HandleKeyboardPress(button) {
+      if (button == '{enter}') {
+        if (this.focus_input == 'account') {
+          this.keyboard_input = ''
+          this.focus_input = 'pw'
+        } else {
+          this.LoginHandle()
+        }
       }
     }
   },
@@ -153,7 +178,24 @@ export default {
   }
 }
 .keyboard {
-  position: relative;
-  top: 0px;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+}
+.button-group {
+  position: absolute;
+  button {
+    font-size: 40px;
+    padding: 8px;
+    height: 70px;
+    width: 260px;
+  }
+}
+.el-input {
+  height: 50px;
+  input {
+    font-size: 40px;
+  }
 }
 </style>

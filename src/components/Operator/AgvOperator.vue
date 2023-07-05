@@ -53,6 +53,7 @@ import ManualSettings from './ManualSettings.vue';
 import WebSocketHelp from '@/api/WebSocketHepler'
 import bus from '@/event-bus.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { UserStore } from '@/store'
 
 export default {
 
@@ -65,7 +66,6 @@ export default {
       DIOTableData: new clsDIOTable(),
       trigger_admin_dialog_count: 5,
       version_text_click_count: 0,
-      isGodMode: false,
       modal_key: ''
     }
   },
@@ -101,9 +101,10 @@ export default {
     },
     AdminSwitchDialogResultHandle(checked = false) {
       this.version_text_click_count = 0;
-      this.isGodMode = checked;
-      bus.emit('/god_mode_changed', checked);
-
+      UserStore.commit('setUser', {
+        UserName: 'GOD',
+        Role: 3
+      });
     }
   },
   props: {
@@ -127,6 +128,9 @@ export default {
     }
   },
   computed: {
+    isGodMode() {
+      return UserStore.getters.IsGodUser;
+    },
     UIVersion() {
       if (version)
         return version;

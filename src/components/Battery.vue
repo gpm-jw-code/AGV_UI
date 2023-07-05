@@ -28,7 +28,17 @@ export default {
       battery_status: new BatteryStatus()
     }
   },
+  props: {
+    Warning_Up_limit: {
+      type: Number,
+      default: 45
+    },
+    Warning_DOwn_limit: {
+      type: Number,
+      default: 20
+    },
 
+  },
   computed: {
     battery_level() {
       return this.battery_status.BatteryLevel;
@@ -36,15 +46,16 @@ export default {
     battery_state_bg() {
       if (this.battery_status.IsCharging)
         return "full-state"
-      if (this.battery_level > 60)
+
+      if (this.battery_level > this.Warning_Up_limit)
         return "full-state"
-      if (this.battery_level <= 60 && this.battery_level >= 30)
+      if (this.battery_level <= this.Warning_Up_limit && this.battery_level >= this.Warning_DOwn_limit)
         return "bg-warning"
       else
         return "bg-danger"
     },
     IsLowBatteryLevel() {
-      return this.battery_level < 30
+      return this.battery_level < this.Warning_DOwn_limit
     }
   },
   mounted() {

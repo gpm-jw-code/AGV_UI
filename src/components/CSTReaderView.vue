@@ -10,7 +10,7 @@
 
     <div class="p-5">
       <img ref="image" src="/tray.jpg" height="400" alt="QR Code" />
-      <div class="barcode_select"></div>
+      <!-- <div class="barcode_select"></div> -->
       <div
         v-show="qrCodeValue!=''"
         v-loading="triggering"
