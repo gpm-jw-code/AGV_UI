@@ -21,10 +21,10 @@
 
           <div class="row">
             <el-form-item class="col-6" label="Linear X">
-              <b-form-input size="sm" disabled v-model.number="vms_data.Pose.position.y"></b-form-input>
+              <b-form-input size="sm" disabled v-model.number="vms_data.LinearSpeed"></b-form-input>
             </el-form-item>
             <el-form-item class="col-6" label="Angular Z">
-              <b-form-input size="sm" disabled v-model.number="vms_data.Pose.position.y"></b-form-input>
+              <b-form-input size="sm" disabled v-model.number="vms_data.AngularSpeed"></b-form-input>
             </el-form-item>
           </div>
         </el-form>

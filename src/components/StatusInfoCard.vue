@@ -67,18 +67,27 @@
             <td>
               <b-form-input size="sm" disabled v-model="vms_data.Current_LASER_MODE"></b-form-input>
             </td>
-            <!-- <td>CIM {{$t('status')}}</td>
-            <td class="val-column">4</td>-->
+          </tr>
+
+          <tr align="justify">
+            <td>直線速度 (m/s)</td>
+            <td class="val-column">
+              <b-form-input size="sm" disabled v-model="vms_data.LinearSpeed"></b-form-input>
+            </td>
+            <td>旋轉速度 (rad/s)</td>
+            <td>
+              <b-form-input size="sm" disabled v-model="vms_data.AngularSpeed"></b-form-input>
+            </td>
           </tr>
           <tr align="justify">
             <td>{{$t('current_position')}}</td>
             <td class="val-column">
-              <b-form-input size="sm" disabled v-model="vms_data.Tag" :state="vms_data.Tag>0"></b-form-input>
+              <b-form-input size="sm" disabled v-model="vms_data.Last_Visit_MapPoint.Name"></b-form-input>
               <!-- <el-input disabled v-model="vms_data.Tag"></el-input> -->
             </td>
             <td>{{$t('target_position')}}</td>
             <td class="val-column">
-              <b-form-input size="sm" disabled v-model="vms_data.NavInfo.Destination"></b-form-input>
+              <b-form-input size="sm" disabled v-model="vms_data.NavInfo.DestinationMapPoint.Name"></b-form-input>
               <!-- <el-input disabled v-model="currentPosition"></el-input> -->
             </td>
           </tr>

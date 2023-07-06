@@ -47,6 +47,7 @@ import { render } from '@vue/runtime-dom';
 import bus from '@/event-bus.js'
 import clsDriverState from '@/ViewModels/clsDriverState';
 import dashboard from '../AGVDashboard/dashboard.vue';
+import { AGVStatusStore } from '@/store';
 export default {
   components: {
     dashboard,
@@ -65,7 +66,6 @@ export default {
       isCarrierExist: false,
       showStatusCard: false,
       DriverState: new clsDriverState(),
-      DriversState: new Array < clsDriverState > []
     }
   },
   computed: {
@@ -77,6 +77,9 @@ export default {
     },
     ZAxisHeight() {
       return this.DriverState.position
+    },
+    DriversState() {
+      return AGVStatusStore.getters.AGVStatus.DriversStates
     }
   },
   methods: {
@@ -200,15 +203,12 @@ export default {
     bus.on('/zaxis_driver_state', (driver_state) => {
       this.DriverState = driver_state;
     })
-    bus.on('/drivers_state', (drivers_state) => {
-      this.DriversState = drivers_state;
-    })
     var domElement = this.Init3DModel();
     document.getElementById('my-three')?.appendChild(domElement)
 
     setInterval(() => {
       this.forkMesh.position.z = this.ZAxisHeight + 20;
-      this.carrierMesh.position.z = this.ZAxisHeight + 20+ (this.CarrierHeight / 2) + (this.ForkDepth / 2);
+      this.carrierMesh.position.z = this.ZAxisHeight + 20 + (this.CarrierHeight / 2) + (this.ForkDepth / 2);
     }, 100);
 
   },

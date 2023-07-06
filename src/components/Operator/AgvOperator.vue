@@ -53,7 +53,7 @@ import ManualSettings from './ManualSettings.vue';
 import WebSocketHelp from '@/api/WebSocketHepler'
 import bus from '@/event-bus.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { UserStore } from '@/store'
+import { UserStore, DIOStore } from '@/store'
 
 export default {
 
@@ -70,6 +70,7 @@ export default {
     }
   },
   mounted() {
+    console.log('agv operator mounted');
     this.DIOTableWSInit();
   },
   methods: {
@@ -78,6 +79,7 @@ export default {
       ws.Connect();
       ws.onmessage = (evt) => {
         this.DIOTableData = JSON.parse(evt.data)
+        DIOStore.commit('updateStatus', this.DIOTableData)
       }
     },
     VersionTextClickHandle() {
@@ -101,10 +103,12 @@ export default {
     },
     AdminSwitchDialogResultHandle(checked = false) {
       this.version_text_click_count = 0;
-      UserStore.commit('setUser', {
-        UserName: 'GOD',
-        Role: 3
-      });
+      if (checked) {
+        UserStore.commit('setUser', {
+          UserName: 'GOD',
+          Role: 3
+        });
+      }
     }
   },
   props: {

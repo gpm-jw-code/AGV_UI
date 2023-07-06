@@ -2,7 +2,7 @@
   <div :class="keyboardClass"></div>
 </template>
   
-  <script>
+<script>
 import Keyboard from "simple-keyboard";
 import "simple-keyboard/build/css/index.css";
 

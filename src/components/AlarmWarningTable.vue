@@ -1,5 +1,5 @@
 <template>
-  <div class="alarm-warn-table px-5">
+  <div class="alarm-warn-table px-1">
     <div class="d-flex flex-row">
       <div class="flex-fill text-start">
         <b-button size="sm" @click="AlarmDownload">{{$t('refresh')}}</b-button>
@@ -14,6 +14,17 @@
         <span class="m-2">Search :</span>
         <el-input size="small" style="width:168px"></el-input>
       </div>
+    </div>
+
+    <div class="w-100 mt-2">
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        :total="totalAlarmNum"
+        :page-size="page_size"
+        v-model="page"
+        @current-change="PageChangeHandler"
+      />
     </div>
     <div class="w-100 border mt-1">
       <el-table
@@ -42,16 +53,6 @@
         </el-table-column>
       </el-table>
     </div>
-    <div class="w-100 mt-2">
-      <el-pagination
-        background
-        layout="prev, pager, next"
-        :total="totalAlarmNum"
-        :page-size="page_size"
-        v-model="page"
-        @current-change="PageChangeHandler"
-      />
-    </div>
     <b-modal
       v-model="clear_alarms_dialog_show"
       centered
@@ -68,17 +69,18 @@ import { AlarmTableAPI } from '@/api/VMSAPI';
 import moment from 'moment';
 import bus from '@/event-bus.js'
 import Notifier from '@/api/NotifyHelper';
+import { UserStore } from '@/store'
 export default {
   data() {
     return {
       alarms: [],
       totalAlarmNum: 0,
       page: 1,
-      page_size: 12,
+      page_size: 15,
       table_loading: false,
       lang: 'zh-TW',
       clear_alarms_dialog_show: false,
-      clear_alarm_btn_visible: false
+
     }
   },
   methods: {
@@ -135,6 +137,11 @@ export default {
       await this.AlarmDownload();
     }
   },
+  computed: {
+    clear_alarm_btn_visible() {
+      return UserStore.getters.CurrentUserRole != 0
+    }
+  },
   async mounted() {
     this.AlarmDownload();
     bus.on('/alarmtable_tab_click', async () => {
@@ -143,9 +150,6 @@ export default {
     bus.on('/lang_changed', (locale) => {
       this.lang = locale
     })
-    bus.on('/login_success', (_UserInfo) => {
-      this.clear_alarm_btn_visible = true;
-    });
   }
 }
 </script>

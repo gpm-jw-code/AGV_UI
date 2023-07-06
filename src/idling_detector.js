@@ -1,8 +1,11 @@
 import bus from './event-bus'
+import { UserStore } from './store';
 var idleTime = 0
 var interval = setInterval(() => {
     idleTime+=1;
     if(idleTime>=10){
+        UserStore.dispatch('Logout')
+        resetTimer()
         bus.emit('idle','');
     }
 }, 1000);

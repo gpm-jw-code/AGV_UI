@@ -1,11 +1,21 @@
 <template>
-  <div class="px-5">
+  <div class="px-1">
     <div class="d-flex flex-row">
       <div class="flex-fill"></div>
       <!-- <div>
         <span class="m-2">Search :</span>
         <el-input size="small" style="width:168px"></el-input>
       </div>-->
+    </div>
+    <div class="w-100 mt-2">
+      <el-pagination
+        :page-size="16"
+        :total="table_data.length"
+        v-model="pagecurrent"
+        background
+        layout="prev, pager, next"
+        @current-change="PageChangeHandler"
+      />
     </div>
     <div class="w-100 border mt-1">
       <el-table
@@ -31,16 +41,6 @@
           </template>
         </el-table-column>-->
       </el-table>
-    </div>
-    <div class="w-100 mt-2">
-      <el-pagination
-        :page-size="16"
-        :total="table_data.length"
-        v-model="pagecurrent"
-        background
-        layout="prev, pager, next"
-        @current-change="PageChangeHandler"
-      />
     </div>
 
     <b-modal

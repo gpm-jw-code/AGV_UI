@@ -18,17 +18,23 @@
           <agv_operator :agv_type="VMSData.Agv_Type"></agv_operator>
         </div>
       </b-tab>
-      <b-tab v-if="is_god_mode_now" :title="$t('3d_model')">
+      <b-tab v-if="IsGodMod" :title="$t('3d_model')">
         <div class="mt-3 border p-1">
           <ForkAGV3D></ForkAGV3D>
         </div>
       </b-tab>
 
-      <b-tab v-if="true" title="Tray Reader">
+      <b-tab v-if="true" title="CST Reader">
         <div class="mt-3 border p-1">
           <CSTReader></CSTReader>
         </div>
       </b-tab>
+      <b-tab v-if="true" title="設備交握(E84)">
+        <div class="mt-3 border p-1">
+          <EQHandshakeView></EQHandshakeView>
+        </div>
+      </b-tab>
+
       <b-tab v-if="IsGodMod" title="Task">
         <div class="mt-3 border p-1">
           <TaskDeliveryVue></TaskDeliveryVue>
@@ -73,13 +79,15 @@ import ForkAGV3D from '@/components/3DModel/ForkAGV3DModel.vue'
 import AGVSMsgDisplay from '@/components/AGVSMsgDisplay.vue'
 import TaskDeliveryVue from '@/components/VMSTask/TaskDelivery.vue'
 import CSTReader from '@/components/CSTReaderView.vue'
+import EQHandshakeView from '@/components/E84/EQHandshakeView.vue'
 import jw_switch from "@/components/UIComponents/jw-switch.vue"
 import Notifier from "@/api/NotifyHelper.js"
 import VMSData from '@/ViewModels/VMSData.js';
 import bus from '@/event-bus.js'
 import { UserStore } from '@/store'
+import EQHandshakeViewVue from '../E84/EQHandshakeView.vue'
 export default {
-  components: { jw_switch, status_card, alarm_warn_table, agv_operator, ForkAGV3D, AGVSMsgDisplay, TaskDeliveryVue, CSTReader },
+  components: { jw_switch, status_card, alarm_warn_table, agv_operator, ForkAGV3D, AGVSMsgDisplay, TaskDeliveryVue, CSTReader, EQHandshakeView },
   props: {
     VMSData: {
       type: Object,

@@ -14,6 +14,8 @@ class VMSData {
   AGVC_ID = -1
   CST_Data = ''
   Tag = -1
+  Last_Visited_Tag = 1
+  Last_Visit_MapPoint = { Name: 'UNKNOWN' }
   BatteryStatus = new BatteryStatus()
   Mileage = 0
   Pose = {
@@ -29,7 +31,9 @@ class VMSData {
       w: 0,
     },
   }
-  Angle=-1
+  LinearSpeed = 0
+  AngularSpeed = 0
+  Angle = -1
   BCR_State_MoveBase = {
     state: 0,
     tagID: 0,
@@ -40,7 +44,10 @@ class VMSData {
   NavInfo = {
     Destination: '',
     Speed_max_limit: -1,
-    PathPlan:[]
+    PathPlan: [],
+    DestinationMapPoint: {
+      Name: 'UNKNOWN'
+    }
   }
   MapComparsionRate = -1
   LocStatus = 10

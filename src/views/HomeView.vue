@@ -40,7 +40,7 @@
       <div class="side h-100">
         <div class="opt-buttons px-1 py-1 d-flex flex-column">
           <b-button
-            :disabled="back_end_server_err||VMSData.IsSystemIniting"
+            :disabled="back_end_server_err||VMSData.IsSystemIniting||VMSData.AlarmCodes.length!=0"
             @click="AGVInitialize()"
             class="mb-1 p-2"
             v-bind:class="VMSData.SubState.toLowerCase()"
@@ -226,7 +226,7 @@ import jw_switch from "@/components/UIComponents/jw-switch.vue"
 import Notifier from "@/api/NotifyHelper.js"
 import WebSocketHelp from '@/api/WebSocketHepler'
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
-import { UserStore } from '@/store'
+import { UserStore, AGVStatusStore } from '@/store'
 import moment from 'moment'
 import MainContent from '@/components/MainContent/TabContainer.vue'
 // @ is an alias to /src
@@ -398,8 +398,8 @@ export default {
 
         this.back_end_server_err = false;
         this.back_end_server_connecting = false;
-
         this.VMSData = JSON.parse(event.data);
+        AGVStatusStore.commit('updateStatus', this.VMSData)
         if (this.VMSData.Tag > 0) {
           bus.emit('/agv_name_list', [{
             AGV_Name: this.VMSData.CarName,
@@ -411,9 +411,6 @@ export default {
 
           if (this.VMSData.Tag != this.previous_tagID) {
             Notifier.Primary(`Tag Detected:${this.VMSData.Tag}`, 'bottom', 1500);
-            
-            //this.ShowMaxSpeedLimitNotification(this.VMSData.Tag, this.VMSData.NavInfo.Speed_max_limit);
-            
             bus.emit('/nav_path_update', {
               name: this.VMSData.CarName,
               tags: this.VMSData.NavInfo.PathPlan
@@ -570,15 +567,6 @@ export default {
     IsOnlineMode() {
       return this.VMSData.OnlineMode == 1;
     },
-    operation_enabled() {
-      if (this.CurrentUserinfo.Role == 3)
-        return true;
-      else if (this.CurrentUserinfo.Role == 0) {
-        return false
-      } else {
-        return !this.IsAutoMode && !this.IsOnlineMode
-      }
-    },
     App_version() {
       return version;
     },
@@ -586,6 +574,9 @@ export default {
       if (this.VMSData.NewestAlarm == undefined) {
         return undefined
       }
+      if (this.VMSData.NewestAlarm.EAlarmCode == 0)
+        return undefined
+
       return this.VMSData.NewestAlarm
     },
     ModeSwitchDisplay() {

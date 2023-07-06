@@ -1,7 +1,9 @@
 class clsDIOTable {
   Inputs
   Outputs
+  IsE84HsUseEmulator
   constructor() {
+    this.IsE84HsUseEmulator = false
     this.Inputs = [
       new clsRegister('X0000', 'name1'),
       new clsRegister('X0001', 'name2'),
@@ -23,6 +25,7 @@ export class clsRegister {
   Name = ''
   State = false
   DigitalType = 0
+
 }
 
 export default clsDIOTable
