@@ -10,7 +10,7 @@ class VMSData {
   IsSystemIniting = false
   OnlineMode = 0
   AutoMode = 0
-  CarName = 'AGV_'
+  CarName = 'AGV'
   AGVC_ID = -1
   CST_Data = ''
   Tag = -1

@@ -2,12 +2,12 @@
   <div class="agv-operator">
     <b-tabs pills small>
       <b-tab :title="$t('agv_control')" active>
-        <div class="mt-3 p-1">
+        <div class="mt-1 p-1">
           <AgvControl :enabled="operation_enabled_return"></AgvControl>
         </div>
       </b-tab>
       <b-tab :disabled="agv_type==1" :title="$t('zaxis_up_down')">
-        <div class="mt-3 p-1">
+        <div class="mt-1 p-1">
           <ZAxisControl :enabled="operation_enabled_return" v-if="type=='jw'"></ZAxisControl>
           <ZAxisControl_hao v-if="type=='hao'"></ZAxisControl_hao>
           <!-- <alarm_warn_table></alarm_warn_table> -->

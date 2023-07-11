@@ -75,7 +75,7 @@ export default {
 .switch-label {
   display: inline-block;
   width: 60px;
-  height: 34px;
+  height: 32px;
   background-color: #ccc;
   border-radius: 3px;
   position: relative;
@@ -86,7 +86,7 @@ export default {
 .switch-inner {
   display: block;
   width: 10px;
-  height: 30px;
+  height: 28px;
   background-color: #fff;
   border-radius: 3px;
   position: absolute;
@@ -98,8 +98,8 @@ export default {
 
 .switch-switch {
   display: block;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   background-color: #333;
   border-radius: 13px;
   position: absolute;

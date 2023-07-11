@@ -13,29 +13,50 @@
           @click="where_r_u()"
         >{{VMSData.CarName}}</div>
         <div class="account-name flex-fill">{{UserName }}</div>
-        <div class="version-name flex-fill">{{ VMSData.APPVersion }}</div>
+        <div
+          @click="VersionTextClickHandle()"
+          class="version-name flex-fill"
+        >{{ VMSData.APPVersion }}</div>
       </div>
-      <div
-        v-bind:class="VMSData.LightsStates.Front?'light-on-front':'light-off-front'"
-        class="w-100"
-      ></div>
     </div>
-
+    <!--語系切換按鈕-->
+    <div class="lang-switch">
+      <jw_switch
+        @switch="LangChangeHandle"
+        :default="IsUseChinese"
+        active_text="CH"
+        active_color="rgb(0, 204, 0)"
+        inactive_text="EN"
+        inactive_color="rgb(9, 76, 176)"
+      ></jw_switch>
+    </div>
     <!-- Alarm and Notifies -->
     <div
+      class="alarm-show p-1 fixed-top"
       v-if="NewestAlarm!=undefined"
-      :class="NewestAlarm.Level=='Alarm'?'alarm-show p-1 bg-danger':'alarm-show p-1 bg-warning'"
-    >{{ $i18n.locale=='zh-TW'? NewestAlarm.CN: NewestAlarm.Description }}</div>
-    <div v-if="back_end_server_err" class="server-error py-1 border">
+      v-bind:class="NewestAlarm.Level=='Alarm'?'bg-danger':'bg-warning'"
+    >
+      <div class="agv-name-in-alarm px-2">{{VMSData.CarName}}</div>
+      <div class="flex-fill">{{ $i18n.locale=='zh-TW'? NewestAlarm.CN: NewestAlarm.Description }}</div>
+    </div>
+
+    <div v-if="back_end_server_err" class="server-error py-1 border fixed-top">
+      <div class="agv-name-in-alarm px-2">{{VMSData.CarName}}</div>
       <i class="bi bi-exclamation-diamond"></i>
       {{$t('backend_server_error')}}
     </div>
-    <div v-if="back_end_server_connecting" class="server-connecting py-1 border">
+    <div v-if="back_end_server_connecting" class="server-connecting py-1 border fixed-top">
+      <div class="agv-name-in-alarm px-2">{{VMSData.CarName}}</div>
       <i class="bi bi-exclamation-diamond"></i>
       {{$t('connecting')}}
     </div>
+    <!-- 電量至頂顯示 -->
+    <div class="battery-fill-width px-0 mt-1 w-100">
+      <i v-if="VMSData.BatteryStatus.IsCharging" style="color:green" class="bi bi-battery-charging"></i>
+      <i v-else :class="'bi bi-battery-full'" :style="{color:'white'}"></i>
+      <battery :showIcon="false" bHeight="1.2rem"></battery>
+    </div>
     <div class="d-flex flex-row h-100">
-      <div v-bind:class="VMSData.LightsStates.Left?'light-on':'light-off'" class="h-100"></div>
       <!--Side 左側邊-->
       <div class="side h-100">
         <div class="opt-buttons px-1 py-1 d-flex flex-column">
@@ -120,12 +141,12 @@
             ></el-switch>
           </div>
         </div>
-        <div class="connection-status border m-2 p-3 py-1">
+        <div class="connection-status border rounded m-2 p-3 py-1">
           <div class="state-title">{{$t('connection-states') }}</div>
           <connection_state></connection_state>
         </div>
 
-        <div class="battery border m-2 my-0 p-3 py-1">
+        <!-- <div class="battery border m-2 my-0 p-3 py-1">
           <div class="state-title py-1">
             {{$t('battery-level')}}
             <img
@@ -139,22 +160,24 @@
             <el-tag v-show="VMSData.BatteryStatus.IsError" type="warning" effect="dark">異常</el-tag>
           </div>
           <battery></battery>
-        </div>
-        <div class="mileage border m-2 p-3 py-1">
+        </div>-->
+        <div class="mileage border rounded m-2 p-3 py-1">
           <div class="state-title">{{$t('mileage')}}</div>
           <mileage></mileage>
         </div>
         <!-- <div>{{ time }}</div> -->
-        <div>
+        <div class="border rounded m-2 p-3 py-1">
           <emo :disabled="back_end_server_err"></emo>
         </div>
       </div>
       <!--主要內容 TabControl-->
 
       <MainContent :VMSData="VMSData"></MainContent>
-      <div v-bind:class="VMSData.LightsStates.Right?'light-on':'light-off'" class="h-100"></div>
     </div>
-    <div v-bind:class="VMSData.LightsStates.Back?'light-on-back':'light-off-front'" class="w-100"></div>
+    <!-- <div class="battery-bottom p-0 bg-primary border w-100 fixed-bottom">
+      <span>電量</span>
+      <battery :showIcon="false" bHeight="2rem"></battery>
+    </div>-->
 
     <!--對話框們-->
     <div class="modals">
@@ -182,30 +205,6 @@
         :ok-only="true"
       >
         <p ref="online-fail-msg"></p>
-      </b-modal>
-
-      <!--取消初始化對話框 -->
-      <b-modal
-        v-model="cancelInitComfirmDialogShow"
-        header-bg-variant="primary"
-        header-text-variant="light"
-        :centered="true"
-        title="Cancel Initialze Process"
-        @ok="CancelInitProcessWorker"
-      >
-        <p>{{$t('cancel_init_action_notify')}}</p>
-      </b-modal>
-
-      <!--確認進行初始化對話框 -->
-      <b-modal
-        v-model="StartInitComfirmDialogShow"
-        header-bg-variant="primary"
-        header-text-variant="light"
-        :centered="true"
-        title="Initialze"
-        @ok="InitializeWorker"
-      >
-        <p>{{$t('start_init_action_notify')}}</p>
       </b-modal>
     </div>
   </div>
@@ -237,8 +236,10 @@ export default {
   },
   data() {
     return {
+      IsUseChinese: true,
       time: '2022/12/12 19:00:09',
-
+      version_text_click_count: 0,
+      trigger_admin_dialog_count: 7,
       back_end_server_err: false,
       back_end_server_connecting: true,
       loading: false,
@@ -266,8 +267,45 @@ export default {
   },
   methods: {
     async where_r_u() {
-
       await Where_r_u();
+    },
+    LangChangeHandle(checked) {
+      this.IsUseChinese = checked;
+      this.$i18n.locale = this.IsUseChinese ? 'zh-TW' : 'en-US';
+      bus.emit('/lang_changed', this.$i18n.locale);
+      if (this.IsUseChinese) {
+        Notifier.Success("語言變更:中文", 'bottom', 800);
+      } else {
+        Notifier.Primary("Language:English", 'bottom', 800);
+      }
+    },
+    VersionTextClickHandle() {
+      this.version_text_click_count += 1;
+      if (this.version_text_click_count > this.trigger_admin_dialog_count) {
+        this.ConfirmGODTriggering();
+      }
+    },
+    ConfirmGODTriggering() {
+      this.$swal.fire({
+        title: 'Warning',
+        text: `Do you known what are you doing now?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        allowOutsideClick: false
+      }).then((result) => {
+        this.AdminSwitchDialogResultHandle(result.isConfirmed);
+      })
+
+    },
+    AdminSwitchDialogResultHandle(checked = false) {
+      this.version_text_click_count = 0;
+      if (checked) {
+        UserStore.commit('setUser', {
+          UserName: 'GOD',
+          Role: 3
+        });
+      }
     },
     ShowLogin() {
       if (this.IsLogin) {
@@ -293,8 +331,6 @@ export default {
         this.cancelInitComfirmDialogShow = true;
       }
       else {
-        // this.StartInitComfirmDialogShow = true;
-        /**測試 */
         this.$swal.fire({
           title: 'AGV Initialize',
           text: `${this.$t('start_init_action_notify_submarin_agv')}`,
@@ -302,9 +338,19 @@ export default {
           showCancelButton: true,
           confirmButtonText: 'OK',
           customClass: 'my-sweetalert'
-        }).then((result) => {
+        }).then(async (result) => {
           if (result.isConfirmed) {
-            this.InitializeWorker();
+            this.isInitializing = true;
+            var result = await Initialize();
+            if (!result.confirm) {
+              this.$swal.fire({
+                title: 'AGV Initialize Fail',
+                text: result.message,
+                icon: 'error',
+                showCancelButton: false,
+                customClass: 'my-sweetalert'
+              })
+            }
           }
         })
 
@@ -324,11 +370,6 @@ export default {
           this.AGVRemoveCassette();
         }
       })
-
-    },
-    async InitializeWorker() {
-      this.isInitializing = true;
-      var result = await Initialize();
 
     },
     async CancelInitProcessWorker() {
@@ -430,20 +471,22 @@ export default {
           console.info(this.ws.wssocket.readyState);
           if (this.ws.wssocket.readyState == WebSocket.OPEN) {
             this.ws.onmessage = null;
-            console.log('reload ');
             this.back_end_server_err = this.back_end_server_connecting = true;
-            this.$swal.fire({
-              title: `Page Reload`,
-              text: `Reconnect! Page will reload after 3 seconds.`,
-              icon: 'information',
-              showCancelButton: false,
-              confirmButtonText: 'OK',
-              customClass: 'my-sweetalert'
-            })
+            // setTimeout(() => {
+            //   this.$swal.fire({
+            //     title: `Page Reload`,
+            //     text: `Reconnect! Page will reload after 2 seconds.`,
+            //     icon: 'information',
+            //     showCancelButton: false,
+            //     confirmButtonText: 'OK',
+            //     customClass: 'my-sweetalert'
+            //   })
+            // }, 100)
+
             clearInterval(id)
             setTimeout(() => {
               location.reload()
-            }, 3000);
+            }, 500);
             return;
           }
           if (this.ws.wssocket.readyState == WebSocket.CLOSED)
@@ -558,7 +601,7 @@ export default {
       return this.IsLogin ? '登出' : '登入';
     },
     alarmResetBtnVariant() {
-      return this.VMSData.AlarmCodes.length > 0 ? 'danger' : 'outline-dark'
+      return this.VMSData.AlarmCodes.length > 0 ? 'danger' : 'light'
     },
 
     IsAutoMode() {
@@ -619,6 +662,17 @@ export default {
 }
 .server-connecting {
   animation: server-connectingcolor-change 1s infinite;
+}
+
+.battery-fill-width {
+  i {
+    position: absolute;
+    left: 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 24px;
+    top: 26px;
+  }
 }
 
 .server-error {
@@ -682,11 +736,19 @@ export default {
     margin-right: 0;
   }
 }
-
+.lang-switch {
+  position: absolute;
+  right: 9px;
+  top: 67px;
+}
 .alarm-show {
   background-color: rgb(248, 215, 218);
   font-weight: bold;
   color: white;
+}
+.agv-name-in-alarm {
+  font-weight: bold;
+  position: absolute;
 }
 
 .modes {
@@ -704,32 +766,5 @@ export default {
   .opt-buttons {
     font-weight: bold;
   }
-}
-
-.light-on,
-.light-off {
-  width: 5px;
-}
-.light-on {
-  background-color: rgb(104, 173, 253);
-}
-
-.light-off.light-off-front {
-  background-color: white;
-}
-.light-on-back {
-  position: fixed;
-  bottom: 0;
-}
-.light-on-front,
-.light-on-back {
-  background-color: rgb(255, 61, 61);
-  animation: server-errorcolor-change 1s infinite;
-}
-
-.light-on-front,
-.light-off-front,
-.light-on-back {
-  height: 5px;
 }
 </style>

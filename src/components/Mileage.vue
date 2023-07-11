@@ -1,6 +1,9 @@
 <template>
   <div class="mileage">
-    <div>{{mileage}} km</div>
+    <div>
+      {{mileage}}
+      <span>km</span>
+    </div>
     <!-- <div>{{ time }}</div> -->
   </div>
 </template>
@@ -31,8 +34,11 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .mileage {
-  font-size: small;
+  font-size: 30px;
+  span {
+    font-size: smaller;
+  }
 }
 </style>

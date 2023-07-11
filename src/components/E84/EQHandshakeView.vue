@@ -11,8 +11,13 @@
     </div>
 
     <el-drawer direction="btt" v-model="show_hs_test_drawer">
-      <b-button class="my-1" variant="danger">正常流程測試</b-button>
-      <b-button class="my-1" variant="danger">EQ異常模擬</b-button>
+      <div class="w-100 d-flex">
+        <b-card title="設備異常模擬">
+          <b-button class="my-1" variant="danger" @click="EQAbnormalWhenEQBusy">EQ異常模擬(EQ動作中)</b-button>
+          <b-button class="my-1" variant="success" @click="EQInitialzeHandler">EQ復歸</b-button>
+        </b-card>
+        <b-button class="my-1" variant="danger">正常流程測試</b-button>
+      </div>
     </el-drawer>
   </div>
 </template>
@@ -20,6 +25,7 @@
 <script>
 import DJM_PIO from './DJM_PIO.vue';
 import { UserStore, DIOStore, AGVStatusStore } from '@/store'
+import { EQAbnormalWhenEQBusyEmu, EQInitialze } from '@/api/EQHSEmuAPI';
 export default {
   components: {
     DJM_PIO,
@@ -38,6 +44,14 @@ export default {
     },
     IsE84UseEmu() {
       return DIOStore.getters.IsE84UseEmu
+    }
+  },
+  methods: {
+    async EQAbnormalWhenEQBusy() {
+      await EQAbnormalWhenEQBusyEmu();
+    },
+    async EQInitialzeHandler() {
+      await EQInitialze();
     }
   },
 }
